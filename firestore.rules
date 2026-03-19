@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+
+    match /courses/{courseId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+    }
+
+    match /units/{unitId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+    }
+
+    match /topics/{topicId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+    }
+
+    match /subtopics/{subtopicId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+    }
+
+    match /progress/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+    }
+
+    match /quizResults/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+    }
+
+    match /mentorChats/{chatId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+    }
+
+    match /explanationCache/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /leaderboard/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+    }
+
+    match /publicCourses/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}

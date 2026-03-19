@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# debug/build artifacts
+errors.txt
+ts_errors.txt
+ts_errors2.txt
+build.log
+build_output.txt
+*.log

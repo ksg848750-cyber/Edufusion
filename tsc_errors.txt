@@ -1,0 +1,4 @@
+src/app/api/explain/route.ts(4,10): error TS2305: Module '"@/lib/cache"' has no exported member 'getExplanationFromCache'.
+src/app/api/explain/route.ts(4,35): error TS2305: Module '"@/lib/cache"' has no exported member 'saveExplanationToCache'.
+src/app/api/explain/route.ts(30,51): error TS2304: Cannot find name 'specificity'.
+src/app/api/explain/route.ts(49,51): error TS2304: Cannot find name 'specificity'.

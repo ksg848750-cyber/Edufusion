@@ -1,65 +1,187 @@
-import Image from "next/image";
+import Link from 'next/link';
+import CinematicIntro from '@/components/layout/CinematicIntro';
+import TickerBar from '@/components/layout/TickerBar';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main>
+      <CinematicIntro />
+
+      {/* Hero Section */}
+      <section
+        className="nb-page-hero min-h-screen flex flex-col items-center justify-center text-center relative nb-bg-grid"
+        style={{ background: 'var(--ink)' }}
+      >
+        <div className="nb-scanline-overlay" />
+
+        <h1 className="nb-display nb-glitch" style={{ color: 'var(--volt)', fontSize: 'clamp(2.5rem, 6vw, 4.5rem)' }}>
+          UNDERSTAND ANYTHING
+          <br />
+          THROUGH WHAT YOU LOVE
+        </h1>
+
+        <p
+          className="nb-mono mt-4"
+          style={{ fontSize: '12px', color: '#666', letterSpacing: '0.15em' }}
+        >
+          CRICKET. MOVIES. ANIME. GAMING. F1. — REAL SCENES. REAL LEARNING.
+        </p>
+
+        <div className="flex gap-4 mt-8">
+          <Link href="/signup" className="nb-btn nb-btn-volt">
+            START LEARNING →
+          </Link>
+          <Link href="/login" className="nb-btn nb-btn-dark">
+            LOGIN
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Floating Example Cards */}
+        <div className="flex gap-6 mt-16 flex-wrap justify-center px-4">
+          {[
+            {
+              concept: 'DEADLOCKS',
+              via: '2011 World Cup Final',
+              emoji: '🏏',
+              color: 'var(--volt)',
+              interest: 'Cricket',
+            },
+            {
+              concept: 'RECURSION',
+              via: "Naruto's Shadow Clone Jutsu",
+              emoji: '🗾',
+              color: 'var(--plasma)',
+              interest: 'Anime',
+            },
+            {
+              concept: 'QUEUES',
+              via: 'F1 Pit Stop Sequence',
+              emoji: '🏎️',
+              color: 'var(--ion)',
+              interest: 'F1',
+            },
+          ].map((card) => (
+            <div
+              key={card.concept}
+              className="nb-card nb-float"
+              style={{
+                borderTop: `4px solid ${card.color}`,
+                background: 'var(--ink)',
+                color: 'var(--chalk)',
+                padding: '1.5rem 2rem',
+                minWidth: '220px',
+              }}
+            >
+              <span style={{ fontSize: '32px' }}>{card.emoji}</span>
+              <p className="nb-display mt-2" style={{ fontSize: '22px', color: card.color }}>
+                {card.concept}
+              </p>
+              <p className="nb-mono mt-1" style={{ fontSize: '10px', color: '#888' }}>
+                explained through {card.via} {card.emoji}
+              </p>
+            </div>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Ticker */}
+      <TickerBar />
+
+      {/* Features Section */}
+      <section className="py-16 px-8" style={{ borderTop: 'var(--bd)', background: 'var(--ink)' }}>
+        <div className="nb-section-label" style={{ color: 'var(--volt)' }}>
+          <span>FEATURES</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mt-8">
+          {[
+            {
+              title: 'REAL SCENE ENGINE',
+              desc: 'We use actual match moments, real movie scenes, specific anime episodes. Never generic analogies.',
+              color: 'var(--volt)',
+              icon: '🎯',
+            },
+            {
+              title: 'YOUR 5 INTERESTS',
+              desc: 'Choose cricket, movies, anime, gaming, F1. Switch interests mid-lesson. Learn through what excites you.',
+              color: 'var(--ion)',
+              icon: '🎮',
+            },
+            {
+              title: 'THRILLER-STYLE TEXT',
+              desc: 'Every explanation reads like a story you cannot put down. No textbook. No boring paragraphs.',
+              color: 'var(--plasma)',
+              icon: '📖',
+            },
+            {
+              title: 'EXAM MODE',
+              desc: 'When exams are near, switch to structured mode. Same scenes, but with formal definitions and key points.',
+              color: 'var(--nova)',
+              icon: '🎓',
+            },
+          ].map((feature) => (
+            <div
+              key={feature.title}
+              className="nb-card"
+              style={{ borderTop: `4px solid ${feature.color}` }}
+            >
+              <span style={{ fontSize: '36px' }}>{feature.icon}</span>
+              <h3 className="nb-display mt-3" style={{ fontSize: '20px' }}>
+                {feature.title}
+              </h3>
+              <p className="mt-2" style={{ fontSize: '14px', color: 'var(--chalk)', opacity: 0.7 }}>
+                {feature.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 px-8" style={{ background: 'var(--ink)', borderTop: 'var(--bd)' }}>
+        <div className="nb-section-label" style={{ color: 'var(--volt)' }}>
+          <span>HOW IT WORKS</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mt-8">
+          {[
+            {
+              step: '01',
+              title: 'CHOOSE YOUR INTEREST',
+              desc: 'Before every lesson, pick one of 5 interests. Cricket, Movies, Anime, Gaming, or F1.',
+              color: 'var(--volt)',
+            },
+            {
+              step: '02',
+              title: 'LEARN WITH REAL SCENES',
+              desc: 'Each concept explained through a real, specific moment from your chosen interest. Not generic analogies.',
+              color: 'var(--ion)',
+            },
+            {
+              step: '03',
+              title: 'TEST & LEVEL UP',
+              desc: 'Take interest-themed quizzes, earn XP, unlock badges, and compete on the leaderboard.',
+              color: 'var(--plasma)',
+            },
+          ].map((item) => (
+            <div key={item.step} className="text-center">
+              <div className="nb-display" style={{ fontSize: '64px', color: item.color }}>
+                {item.step}
+              </div>
+              <h3 className="nb-display mt-2" style={{ fontSize: '20px', color: 'var(--chalk)' }}>
+                {item.title}
+              </h3>
+              <p className="mt-2" style={{ fontSize: '14px', color: 'var(--chalk)', opacity: 0.6 }}>
+                {item.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <Link href="/signup" className="nb-btn nb-btn-volt">
+            GET STARTED FREE →
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }
