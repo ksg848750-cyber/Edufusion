@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import { type ReactNode, type ButtonHTMLAttributes, forwardRef } from 'react';
 
-type NbButtonVariant = 'volt' | 'plasma' | 'ion' | 'solar' | 'nova' | 'dark' | 'chalk';
+type NbButtonVariant = 'volt' | 'plasma' | 'ion' | 'solar' | 'nova' | 'dark' | 'chalk' | 'blue' | 'default';
 
 interface NbButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -18,7 +18,7 @@ const NbButton = forwardRef<HTMLButtonElement, NbButtonProps>(
         ref={ref}
         className={cn(
           'nb-btn',
-          `nb-btn-${variant}`,
+          variant !== 'default' && `nb-btn-${variant}`,
           size === 'sm' && 'text-xs px-3 py-1.5',
           size === 'lg' && 'text-lg px-8 py-3',
           className

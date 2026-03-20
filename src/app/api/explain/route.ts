@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { explanationRequestSchema } from "@/utils/validate";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { getCached, setCached, hashPrompt } from "@/lib/cache";
-import { callGroqJSON } from "@/lib/groq";
-import { generateExplanationPrompt } from "@/lib/prompt";
+import { callGroqJSON, MODEL_SMART } from "@/lib/groq";
+import { generateExplanationPrompt, SYSTEM_PERSONA } from "@/lib/prompt";
 import { ZodError } from "zod";
 
 export async function POST(req: NextRequest) {
@@ -22,9 +22,9 @@ return NextResponse.json(
     const { topic, interest, mode, language, specificContext } = validatedData;
     const finalSpecificity = specificContext || "";
 
-    // 3. Check Cache First
+    // 3. Check Cache First (v17: Storyboard Force Update)
     const prompt = generateExplanationPrompt(topic, interest, mode, language, specificContext);
-    const hash = await hashPrompt(prompt);
+    const hash = await hashPrompt(prompt + "|v17");
     
     const cachedExplanation = await getCached(hash);
     if (cachedExplanation) {
@@ -33,13 +33,17 @@ return NextResponse.json(
             interest,
             mode,
             language,
-            explanation: cachedExplanation,
+            explanation: (cachedExplanation as any).result || cachedExplanation,
             cached: true,
         });
     }
 
     // 4. Generate AI Explanation
-    const explanation = await callGroqJSON<any>(prompt);
+    const explanation = await callGroqJSON<any>(
+        prompt,
+        MODEL_SMART,
+        SYSTEM_PERSONA
+    );
 
     // 5. Save to Cache
     await setCached(hash, {

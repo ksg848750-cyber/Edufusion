@@ -25,6 +25,7 @@ export const generateSubtopicExplanationSchema = z.object({
   mode: modeEnum,
   language: languageEnum,
   specificity: z.string().max(500).optional(),
+  subtopicIndex: z.number().int().min(0).optional(),
 });
 
 export const generateQuizSchema = z.object({

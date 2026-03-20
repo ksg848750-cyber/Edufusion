@@ -17,10 +17,9 @@ export default function Navbar() {
 
   return (
     <nav
-      className="flex items-center justify-between px-6 py-4 sticky top-0 z-50 transition-all"
+      className="flex items-center justify-between px-6 py-4 sticky top-0 z-50 transition-all border-b-4 border-black"
       style={{
-        background: 'var(--ink)',
-        borderBottom: 'var(--bd)',
+        background: 'var(--theme-bg)',
       }}
     >
       {/* Logo */}
@@ -28,12 +27,13 @@ export default function Navbar() {
           <span
             className="nb-display px-4 py-1.5"
             style={{
-              background: 'var(--volt)',
-              color: 'var(--ink)',
-              fontSize: '20px',
+              background: 'var(--theme-accent)',
+              color: 'var(--theme-bg)',
+              fontSize: '22px',
+              fontWeight: 900,
               letterSpacing: '0.05em',
-              border: 'var(--bd)',
-              boxShadow: 'var(--sh-sm)'
+              border: '4px solid black',
+              boxShadow: '4px 4px 0 black'
             }}
           >
             EDUFUSION
@@ -42,22 +42,24 @@ export default function Navbar() {
 
       {/* Nav Links */}
       {user && (
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-10">
           {links.map((link) => {
             const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className="nb-mono no-underline transition-colors"
-                style={{
-                  fontSize: '11px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  color: isActive ? 'var(--volt)' : '#666',
-                  borderBottom: isActive ? '3px solid var(--volt)' : '3px solid transparent',
-                  paddingBottom: '4px',
-                }}
+                className="nb-mono no-underline transition-all hover:scale-110"
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: '900',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.15em',
+                    color: isActive ? 'var(--theme-accent)' : 'var(--theme-text)',
+                    borderBottom: isActive ? '5px solid var(--theme-accent)' : '5px solid transparent',
+                    padding: '6px 10px',
+                    background: isActive ? 'rgba(var(--theme-accent-rgb), 0.15)' : 'transparent',
+                  }}
               >
                 {link.label}
               </Link>
@@ -68,53 +70,35 @@ export default function Navbar() {
 
       {/* Right side */}
       {user && userProfile && (
-        <div className="flex items-center gap-3">
-          {/* Level Badge */}
-          <span
-            className="nb-mono px-3 py-1"
-            style={{
-              fontSize: '11px',
-              fontWeight: 'bold',
-              background: 'var(--plasma)',
-              color: '#fff',
-              border: 'var(--bd)',
-              boxShadow: 'var(--sh-sm)'
-            }}
-          >
-            LV {userProfile.level || 1}
-          </span>
+        <div className="flex items-center gap-6">
+          <div className="flex flex-col items-end">
+             <span className="nb-mono text-[9px] font-bold opacity-80" style={{ color: 'var(--theme-accent)' }}>TOTAL XP</span>
+             <span className="nb-display" style={{ fontSize: '24px', lineHeight: 1, color: 'var(--theme-accent)' }}>{userProfile.xp || 0}</span>
+          </div>
 
-          {/* XP */}
-          <span
-            className="nb-mono"
-            style={{ fontSize: '11px', color: 'var(--volt)' }}
-          >
-            {userProfile.xp || 0} XP
-          </span>
-
-          {/* Settings/Logout */}
-          <div className="flex items-center gap-2">
-            <Link
-              href="/settings"
-              className="nb-mono no-underline"
-              style={{ fontSize: '10px', color: '#666' }}
-            >
-              ⚙️
-            </Link>
-            <button
-              onClick={signOut}
-              className="nb-mono"
+          <Link href="/profile" className="flex items-center gap-3 no-underline group">
+            <div
+              className="nb-mono px-5 py-2.5 transition-all group-hover:-rotate-2"
               style={{
-                fontSize: '10px',
-                color: '#666',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: '900',
+                background: 'var(--theme-accent-secondary)',
+                color: 'var(--theme-bg)',
+                border: '4px solid black',
+                boxShadow: '4px 4px 0 black'
               }}
             >
-              ↗ OUT
-            </button>
-          </div>
+              LV {userProfile.level || 1}
+            </div>
+          </Link>
+
+          <button
+            onClick={signOut}
+            className="nb-mono px-4 py-2 border-4 transition-all"
+            style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--theme-text)', background: 'none', cursor: 'pointer', borderColor: 'rgba(var(--theme-text-rgb), 0.2)' }}
+          >
+           EXIT
+          </button>
         </div>
       )}
     </nav>

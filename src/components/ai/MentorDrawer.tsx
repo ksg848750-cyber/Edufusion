@@ -87,18 +87,18 @@ export default function MentorDrawer({
     <div
       className="fixed top-0 right-0 h-full w-full sm:w-[500px] z-50 flex flex-col"
       style={{
-        background: 'var(--ink)',
-        borderLeft: 'var(--bd)',
-        boxShadow: '-10px 0 0 rgba(0,0,0,1)',
+        background: 'var(--theme-bg)',
+        borderLeft: 'var(--theme-border)',
+        boxShadow: '-10px 0 0 rgba(0,0,0,0.5)',
       }}
     >
       {/* Header */}
       <div
         className="flex items-center justify-between p-6"
-        style={{ borderBottom: 'var(--bd)', background: 'var(--nova)' }}
+        style={{ borderBottom: 'var(--theme-border)', background: 'var(--theme-accent)' }}
       >
         <div>
-          <div className="nb-display" style={{ fontSize: '24px', color: '#fff', lineHeight: 1 }}>
+          <div className="nb-display" style={{ fontSize: '24px', color: 'var(--theme-bg)', lineHeight: 1 }}>
             AI MENTOR
           </div>
           <div className="nb-mono mt-1" style={{ fontSize: '10px', fontWeight: 'bold', color: 'rgba(255,255,255,0.8)', letterSpacing: '0.1em' }}>
@@ -126,10 +126,10 @@ export default function MentorDrawer({
             key={i}
             className={msg.role === 'user' ? 'nb-chat-user ml-12' : 'nb-chat-ai mr-12'}
             style={{ 
-              color: msg.role === 'user' ? 'var(--ink)' : 'var(--chalk)',
+              color: msg.role === 'user' ? 'var(--theme-bg)' : 'var(--theme-text)',
               padding: '1rem 1.25rem',
-              border: 'var(--bd)',
-              background: msg.role === 'user' ? 'var(--volt)' : 'var(--ink)'
+              border: 'var(--theme-border)',
+              background: msg.role === 'user' ? 'var(--theme-accent)' : 'var(--theme-bg)'
             }}
           >
             <div className="nb-mono mb-1" style={{ fontSize: '8px', fontWeight: 'bold', textTransform: 'uppercase', opacity: 0.5 }}>
@@ -156,7 +156,7 @@ export default function MentorDrawer({
       </div>
 
       {/* Input */}
-      <div className="p-6 pb-10" style={{ borderTop: 'var(--bd)', background: 'var(--ink)' }}>
+      <div className="p-6 pb-10" style={{ borderTop: 'var(--theme-border)', background: 'var(--theme-bg)' }}>
         <div className="flex gap-2">
           <input
             className="nb-input flex-1"
@@ -169,7 +169,8 @@ export default function MentorDrawer({
             disabled={loading}
           />
           <NbButton
-            variant="nova"
+            variant="default"
+            style={{ background: 'var(--theme-accent)', color: 'var(--theme-bg)' }}
             onClick={sendMessage}
             disabled={!input.trim() || loading}
           >

@@ -25,16 +25,17 @@ export default function SceneSwitcher({
   const [customInput, setCustomInput] = useState('');
 
   return (
-    <NbCard className="p-8" style={{ background: 'var(--ink)', border: 'var(--bd)', boxShadow: 'var(--sh)' }}>
+    <NbCard className="p-8" style={{ background: 'var(--theme-bg)', border: 'var(--theme-border)', boxShadow: 'var(--theme-shadow)' }}>
       <div className="nb-mono mb-4" style={{ fontSize: '9px', color: '#888', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
         WANT A DIFFERENT VIBE?
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <NbButton
-          variant="volt"
+          variant="default"
           onClick={onDifferentScene}
           disabled={loading}
+          style={{ background: 'var(--theme-accent)', color: 'var(--theme-bg)' }}
         >
           🔄 NEW SCENE IN THIS WORLD
         </NbButton>
@@ -44,6 +45,7 @@ export default function SceneSwitcher({
         <input
           type="text"
           className="nb-input flex-1"
+          style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--theme-accent)', borderColor: 'var(--theme-accent)' }}
           placeholder='INPUT CUSTOM COMMAND...'
           value={customInput}
           onChange={(e) => setCustomInput(e.target.value)}
@@ -55,8 +57,9 @@ export default function SceneSwitcher({
           }}
         />
         <NbButton
-          variant="solar"
+          variant="default"
           disabled={!customInput.trim() || loading}
+          style={{ background: 'var(--theme-accent-tertiary)', color: 'var(--theme-bg)' }}
           onClick={() => {
             if (customInput.trim()) {
               onCustomScene(customInput.trim());
@@ -85,10 +88,10 @@ export default function SceneSwitcher({
                 style={{
                   fontSize: '11px',
                   fontWeight: 'bold',
-                  border: 'var(--bd)',
+                  border: 'var(--theme-border)',
                   boxShadow: '4px 4px 0 black',
-                  background: 'var(--ink)',
-                  color: 'var(--chalk)',
+                  background: 'var(--theme-bg)',
+                  color: 'var(--theme-text)',
                   cursor: loading ? 'not-allowed' : 'pointer',
                   opacity: loading ? 0.5 : 1,
                 }}

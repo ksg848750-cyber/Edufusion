@@ -51,14 +51,14 @@ export default function LevelUpModal({
       <div 
         className="nb-card text-center p-12 max-w-lg relative overflow-hidden"
         style={{ 
-          background: 'var(--ink)', 
-          border: 'var(--bd)', 
-          boxShadow: 'var(--sh-lg)',
+          background: 'var(--theme-bg)', 
+          border: 'var(--theme-border)', 
+          boxShadow: 'var(--theme-shadow)',
           borderRadius: '0'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="nb-display nb-glitch" style={{ fontSize: '72px', color: 'var(--volt)' }}>
+        <div className="nb-display nb-glitch" style={{ fontSize: '72px', color: 'var(--theme-accent)' }}>
           LEVEL UP!
         </div>
 
@@ -67,10 +67,10 @@ export default function LevelUpModal({
             className="nb-display inline-block px-6 py-2"
             style={{
               fontSize: '48px',
-              background: 'var(--volt)',
-              color: 'var(--ink)',
-              border: 'var(--bd)',
-              boxShadow: 'var(--sh)',
+              background: 'var(--theme-accent)',
+              color: 'var(--theme-bg)',
+              border: 'var(--theme-border)',
+              boxShadow: 'var(--theme-shadow)',
               borderRadius: '0'
             }}
           >
@@ -84,12 +84,16 @@ export default function LevelUpModal({
           </span>
         </div>
 
-        <p className="nb-mono mt-8" style={{ fontSize: '15px', color: 'var(--chalk)', lineHeight: 1.5 }}>
+        <p className="nb-mono mt-8" style={{ fontSize: '15px', color: 'var(--theme-text)', lineHeight: 1.5 }}>
           {message}
         </p>
 
         <div className="mt-6">
-          <NbButton variant="volt" onClick={onClose}>
+          <NbButton 
+            variant="default" 
+            onClick={onClose}
+            style={{ background: 'var(--theme-accent)', color: 'var(--theme-bg)' }}
+          >
             KEEP GOING →
           </NbButton>
         </div>

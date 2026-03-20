@@ -9,6 +9,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import type { ExplanationResponse } from "@/types/explanation";
+import UnifiedExplainer from "@/components/learning/UnifiedExplainer";
+import VoicePlayer from "@/components/ai/VoicePlayer";
+import ThemeFlare from "@/components/learning/ThemeFlare";
 
 export default function ExplainPageWrapper() {
   return (
@@ -41,11 +44,16 @@ function ExplainPage() {
   const [error, setError] = useState<string | null>(null);
   const [specificContext, setSpecificContext] = useState("");
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  const [loadingImage, setLoadingImage] = useState(false);
+  const [storyboardImages, setStoryboardImages] = useState<string[] | null>(null);
+  const [loadingStoryboard, setLoadingStoryboard] = useState(false);
+  const [sessionSeed] = useState(() => Math.floor(Math.random() * 999999));
 
   // Use interests from user profile, fallback to defaults
   const availableInterests = userProfile?.interests?.length
-    ? userProfile.interests
-    : ["Movies", "Cricket", "Anime", "Gaming"];
+    ? userProfile.interests.map(i => i.toLowerCase())
+    : ["movies", "cricket", "anime", "gaming"];
 
   // Set default interest from profile if not from URL
   useEffect(() => {
@@ -111,6 +119,84 @@ function ExplainPage() {
     }
   };
 
+  const handleGenerateImage = async () => {
+    if (!explanation) return;
+    setLoadingImage(true);
+    try {
+      const token = await getToken();
+      const res = await fetch("/api/scene-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ 
+          sceneDescription: (explanation as any).scene,
+          concept: concept,
+          interest: activeInterest,
+          sceneSource: (explanation as any).scene_source
+        }),
+      });
+      const data = await res.json();
+      if (data.imageUrl) {
+        setImageUrl(data.imageUrl);
+      }
+    } catch (err) {
+      console.error("Image generation failed", err);
+    } finally {
+      setLoadingImage(false);
+    }
+  };
+
+  const handleGenerateStoryboard = async () => {
+    console.log("--- START STORYBOARD GENERATION (EXPLAIN) ---");
+    if (!user || !explanation || !(explanation as any).storyboard) {
+      console.log("MISSING DATA:", { user: !!user, hasExpl: !!explanation, hasStory: !!(explanation as any)?.storyboard });
+      return;
+    }
+    const storyboard = (explanation as any).storyboard as string[];
+    console.log("Frames to generate:", storyboard.length);
+    setLoadingStoryboard(true);
+    try {
+      const token = await getToken();
+      // Generate images one-by-one to respect Pollinations IP rate limits (max 1 concurrent)
+      const urls: string[] = [];
+      for (let i = 0; i < storyboard.length; i++) {
+        const frame = storyboard[i];
+        try {
+          const res = await fetch("/api/scene-image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({ 
+              sceneDescription: frame,
+              concept: concept,
+              interest: activeInterest,
+              sceneSource: (explanation as any).scene_source
+            }),
+          });
+          const data = await res.json();
+          if (data.imageUrl) {
+            // Sync seed for visual likeness across the analogy
+            const syncedUrl = data.imageUrl.replace(/seed=\d+/, `seed=${sessionSeed}`);
+            urls.push(syncedUrl);
+            setStoryboardImages([...urls]);
+          }
+          // Buffer (2.5s) to avoid concurrent IP rate limits
+          await new Promise(r => setTimeout(r, 2500));
+        } catch (e) {
+          console.error(`Frame ${i} failed:`, e);
+        }
+      }
+    } catch (err) {
+      console.error("Storyboard generation failed", err);
+    } finally {
+      setLoadingStoryboard(false);
+    }
+  };
+
   // Auto-generate if concept came from URL
   useEffect(() => {
     if (!hasGenerated && user !== undefined && conceptFromUrl && activeInterest) {
@@ -136,12 +222,20 @@ function ExplainPage() {
   // --- INPUT SCREEN (no concept yet) ---
   if (!hasGenerated || (!explanation && !loading && !error)) {
     return (
-      <main style={{ background: 'var(--ink)', minHeight: '100vh' }} className="p-4 md:p-8 pt-24">
-        <div className="max-w-3xl mx-auto">
+      <main 
+        style={{ background: 'var(--ink)', minHeight: '100vh', position: 'relative' }} 
+        className="p-4 md:p-8 pt-24"
+        data-theme={activeInterest.toLowerCase()}
+      >
+        <ThemeFlare interest={activeInterest.toLowerCase()} />
+        <div className="nb-bg-grid fixed inset-0 z-0" style={{ backgroundColor: 'var(--theme-bg)' }} />
+        
+        <div className="max-w-3xl mx-auto relative z-10">
           <button
             onClick={() => router.back()}
             className="nb-mono flex items-center gap-2 mb-8 px-3 py-1 transition-all"
             style={{ fontSize: '11px', color: '#888', border: 'var(--bd)', background: 'transparent', cursor: 'pointer' }}
+            suppressHydrationWarning
           >
             <ArrowLeft className="w-4 h-4" /> BACK
           </button>
@@ -166,6 +260,7 @@ function ExplainPage() {
               onChange={(e) => setConcept(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleExplain()}
               autoFocus
+              suppressHydrationWarning
             />
           </div>
 
@@ -180,6 +275,7 @@ function ExplainPage() {
                   key={int}
                   onClick={() => setActiveInterest(int)}
                   className="nb-mono px-4 py-2 transition-all capitalize"
+                  suppressHydrationWarning
                   style={{
                     fontSize: '12px',
                     border: 'var(--bd)',
@@ -211,8 +307,15 @@ function ExplainPage() {
 
   // --- RESULT SCREEN ---
   return (
-    <main style={{ background: 'var(--ink)', minHeight: '100vh' }} className="p-4 md:p-8 pt-24">
-      <div className="max-w-7xl mx-auto space-y-8 pb-32">
+    <main 
+      style={{ background: 'var(--ink)', minHeight: '100vh', position: 'relative' }} 
+      className="p-4 md:p-8 pt-24"
+      data-theme={activeInterest.toLowerCase()}
+    >
+      <ThemeFlare interest={activeInterest.toLowerCase()} />
+      <div className="nb-bg-grid fixed inset-0 z-0" style={{ backgroundColor: 'var(--theme-bg)' }} />
+
+      <div className="max-w-7xl mx-auto space-y-8 pb-32 relative z-10">
 
         {/* Back Button */}
         <button
@@ -220,6 +323,7 @@ function ExplainPage() {
             setExplanation(null);
             setHasGenerated(false);
             setError(null);
+            setStoryboardImages(null);
           }}
           className="nb-mono flex items-center gap-2 px-3 py-1 transition-all"
           style={{ fontSize: '11px', color: '#888', border: 'var(--bd)', background: 'transparent', cursor: 'pointer' }}
@@ -236,17 +340,28 @@ function ExplainPage() {
             <p className="nb-mono mt-2" style={{ fontSize: '11px', color: '#888' }}>
               Explained through{" "}
               <span style={{ color: 'var(--volt)', fontWeight: 'bold' }}>{activeInterest}</span>
-              {" "}in {language}
+               {" "}in {language}
             </p>
           </div>
 
-          {/* Interest Switcher */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-6">
+            {explanation && (
+              <div className="w-64">
+                <VoicePlayer
+                  text={(explanation as any).hook + ". " + (explanation as any).scene + ". " + (explanation as any).twist + ". " + (explanation as any).deep_dive}
+                  language={language}
+                />
+              </div>
+            )}
+            
+            {/* Interest Switcher */}
+            <div className="flex items-center gap-2 flex-wrap">
             {availableInterests.map((int: string) => (
               <button
                 key={int}
                 onClick={() => handleInterestChange(int)}
                 className="nb-mono px-3 py-1 transition-all capitalize"
+                suppressHydrationWarning
                 style={{
                   fontSize: '11px',
                   border: 'var(--bd)',
@@ -258,6 +373,7 @@ function ExplainPage() {
                 {int}
               </button>
             ))}
+            </div>
           </div>
         </div>
 
@@ -292,240 +408,18 @@ function ExplainPage() {
 
         /* Explanation Content */
         ) : explanation ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-8"
-          >
-            {/* Main Column */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
-              <NbCard>
-                <div className="space-y-8">
-                  {/* Scene Source */}
-                  <section>
-                    <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--volt)', color: 'var(--ink)' }}>
-                      SCENE SOURCE
-                    </span>
-                    <p className="nb-mono mt-3" style={{ fontSize: '13px', color: 'var(--chalk)', lineHeight: 1.7 }}>
-                      {explanation.scene_source}
-                    </p>
-                  </section>
-
-                  {/* Hook */}
-                  <section>
-                    <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--plasma)', color: '#fff' }}>
-                      THE HOOK
-                    </span>
-                    <p className="mt-3" style={{ fontSize: '18px', color: 'var(--chalk)', fontWeight: 'bold', lineHeight: 1.5 }}>
-                      {explanation.hook}
-                    </p>
-                  </section>
-
-                  {/* Scene */}
-                  <section>
-                    <span className="nb-mono px-2 py-1 inline-flex items-center gap-1" style={{ fontSize: '10px', background: 'var(--volt)', color: 'var(--ink)' }}>
-                      <Zap className="w-3 h-3" /> THE SCENE
-                    </span>
-                    <div className="mt-3 p-4" style={{ border: '2px solid #333', background: 'rgba(212,255,0,0.03)' }}>
-                      <p className="nb-mono" style={{ fontSize: '13px', color: 'var(--chalk)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
-                        {explanation.scene}
-                      </p>
-                    </div>
-                  </section>
-
-                  {/* Twist */}
-                  <section>
-                    <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--solar)', color: 'var(--ink)' }}>
-                      THE TWIST
-                    </span>
-                    <div className="mt-3 p-4" style={{ borderLeft: '4px solid var(--solar)' }}>
-                      <p style={{ fontSize: '16px', color: 'var(--chalk)', fontStyle: 'italic', fontWeight: 'bold', lineHeight: 1.5 }}>
-                        {explanation.twist}
-                      </p>
-                    </div>
-                  </section>
-
-                  {/* Deep Dive */}
-                  <section>
-                    <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--ion)', color: 'var(--ink)' }}>
-                      DEEP DIVE
-                    </span>
-                    <div className="mt-3 space-y-4">
-                      {explanation.deep_dive
-                        .split("\n\n")
-                        .filter(Boolean)
-                        .map((para, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.15 }}
-                            className="p-4"
-                            style={{ border: '1px solid #333', background: 'rgba(0,200,200,0.03)' }}
-                          >
-                            <p className="nb-mono" style={{ fontSize: '13px', color: 'var(--chalk)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
-                              {para}
-                            </p>
-                          </motion.div>
-                        ))}
-                    </div>
-                  </section>
-
-                  {/* Technical Definition */}
-                  <section>
-                    <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--ion)', color: 'var(--ink)' }}>
-                      TECHNICAL DEFINITION
-                    </span>
-                    <div className="mt-3 p-4" style={{ border: '1px solid #333', background: 'rgba(0,200,100,0.03)' }}>
-                      <p className="nb-mono" style={{ fontSize: '13px', color: 'var(--chalk)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
-                        {explanation.technical}
-                      </p>
-                    </div>
-                  </section>
-
-                  {/* Analogy Mapping */}
-                  <section>
-                    <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--plasma)', color: '#fff' }}>
-                      ANALOGY MAPPING
-                    </span>
-                    <div className="mt-3 space-y-2">
-                      {explanation.mapping?.map((item, id) => (
-                        <div key={id} className="flex items-center gap-3" style={{ fontSize: '12px' }}>
-                          <span className="nb-mono px-2 py-1" style={{ background: 'var(--volt)', color: 'var(--ink)', minWidth: '120px', textAlign: 'center' }}>
-                            {item.concept}
-                          </span>
-                          <span style={{ color: '#666' }}>→</span>
-                          <span className="nb-mono" style={{ color: 'var(--chalk)' }}>
-                            {item.scene_element}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-
-                  {/* Key Points — Exam Mode Only */}
-                  {mode === "exam" && explanation.key_points && explanation.key_points.length > 0 && (
-                    <section>
-                      <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--volt)', color: 'var(--ink)' }}>
-                        🔑 KEY POINTS FOR EXAMS
-                      </span>
-                      <ul className="mt-3 space-y-2">
-                        {explanation.key_points.map((pt, id) => (
-                          <li key={id} className="nb-mono flex items-start gap-2 p-2" style={{ fontSize: '12px', color: 'var(--chalk)', border: '1px solid #333' }}>
-                            <span style={{ color: 'var(--volt)' }}>▸</span>
-                            <span>{pt}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </section>
-                  )}
-
-                  {/* Cliffhanger Summary */}
-                  <section style={{ borderTop: '2px solid #333', paddingTop: '24px' }}>
-                    <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--volt)', color: 'var(--ink)' }}>
-                      CLIFFHANGER
-                    </span>
-                    <p className="mt-3 nb-display" style={{ fontSize: '20px', color: 'var(--volt)', fontStyle: 'italic' }}>
-                      &ldquo;{explanation.summary}&rdquo;
-                    </p>
-                  </section>
-                </div>
-              </NbCard>
-
-              {/* Storyboard */}
-              {explanation.storyboard && explanation.storyboard.length > 0 && (
-                <div>
-                  <span className="nb-mono px-2 py-1 mb-4 inline-block" style={{ fontSize: '10px', background: '#333', color: 'var(--chalk)' }}>
-                    VISUAL STORYBOARD
-                  </span>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-                    {explanation.storyboard.map((frame, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.15 + 0.3 }}
-                      >
-                        <NbCard className="aspect-square flex flex-col items-center justify-center p-3 text-center">
-                          <div className="nb-display mb-2" style={{ fontSize: '28px', color: 'var(--volt)' }}>{idx + 1}</div>
-                          <p className="nb-mono" style={{ fontSize: '10px', color: '#888' }}>{frame}</p>
-                        </NbCard>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Sidebar */}
-            <div className="flex flex-col gap-4">
-
-              {/* Analogy Works */}
-              <NbCard>
-                <span className="nb-mono px-2 py-1 inline-flex items-center gap-1" style={{ fontSize: '10px', background: 'var(--ion)', color: 'var(--ink)' }}>
-                  <CheckCircle2 className="w-3 h-3" /> WHERE IT WORKS
-                </span>
-                <p className="nb-mono mt-3" style={{ fontSize: '12px', color: '#aaa', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-                  {explanation.analogy_works}
-                </p>
-              </NbCard>
-
-              {/* Analogy Breaks */}
-              <NbCard>
-                <span className="nb-mono px-2 py-1 inline-flex items-center gap-1" style={{ fontSize: '10px', background: '#f87171', color: '#fff' }}>
-                  <ShieldAlert className="w-3 h-3" /> WHERE IT BREAKS
-                </span>
-                <p className="nb-mono mt-3" style={{ fontSize: '12px', color: '#aaa', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-                  {explanation.analogy_breaks}
-                </p>
-              </NbCard>
-
-              {/* Regenerate with Specific Context */}
-              <NbCard variant="volt">
-                <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--nova)', color: '#fff' }}>
-                  WANT A SPECIFIC SCENE?
-                </span>
-                <p className="nb-mono mt-3 mb-3" style={{ fontSize: '11px', color: '#888' }}>
-                  Got a favourite{" "}
-                  {activeInterest === "Movies"
-                    ? "movie or genre"
-                    : activeInterest === "Cricket"
-                    ? "match or player"
-                    : activeInterest === "Gaming"
-                    ? "game"
-                    : activeInterest === "Anime"
-                    ? "show or arc"
-                    : "moment"}{" "}
-                  in mind?
-                </p>
-                <input
-                  type="text"
-                  className="nb-input w-full mb-3"
-                  placeholder={
-                    activeInterest === "Movies"
-                      ? "e.g. Inception or Interstellar"
-                      : activeInterest === "Cricket"
-                      ? "e.g. 2011 World Cup or Dhoni"
-                      : activeInterest === "Gaming"
-                      ? "e.g. Minecraft or GTA V"
-                      : activeInterest === "Anime"
-                      ? "e.g. Naruto or Attack on Titan"
-                      : "Type a specific context..."
-                  }
-                  value={specificContext}
-                  onChange={(e) => setSpecificContext(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && generate(activeInterest)}
-                />
-                <NbButton
-                  variant="plasma"
-                  className="w-full"
-                  onClick={() => generate(activeInterest)}
-                >
-                  <RefreshCw className="w-4 h-4" /> REGENERATE
-                </NbButton>
-              </NbCard>
-            </div>
-          </motion.div>
+          <UnifiedExplainer
+            explanation={explanation as any}
+            interest={activeInterest}
+            mode={mode}
+            onRegenerate={generate}
+            onGenerateImage={handleGenerateImage}
+            onGenerateStoryboard={handleGenerateStoryboard}
+            imageUrl={imageUrl}
+            storyboardImages={storyboardImages || undefined}
+            loadingImage={loadingImage}
+            loadingStoryboard={loadingStoryboard}
+          />
         ) : null}
       </div>
     </main>

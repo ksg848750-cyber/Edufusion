@@ -21,10 +21,23 @@ export async function POST(req: NextRequest) {
 
     const { sceneDescription, concept, interest, sceneSource } = result.data;
 
-    const imagePrompt = `${sceneDescription}, in the style of ${interest}, educational illustration, concept labels showing '${concept}', dynamic composition, cinematic lighting, clean art style${sceneSource ? `, based on ${sceneSource}` : ''}`;
+    // Trademark-Safe & Hyphenated: High stability for Pollinations
+    // We strip specific movie/brand names to avoid copyright filters
+    const bannedWords = ['shawshank', 'redemption', 'disney', 'marvel', 'cricket', 'mi ', 'csk ', 'mumbai indians', 'chennai super kings'];
+    let safeDescription = (sceneDescription || '').toLowerCase();
+    bannedWords.forEach(word => {
+      safeDescription = safeDescription.replace(new RegExp(word, 'g'), 'the scene');
+    });
 
-    const encoded = encodeURIComponent(imagePrompt);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=800&height=450&nologo=true`;
+    // ULTRA-EXTREME SHORTENING (Max 40 chars)
+    // Complex prompts trigger rate-limiting or filtering faster.
+    const promptBase = `${safeDescription.slice(0, 30)} ${interest}`.replace(/[^a-zA-Z0-9]/g, ' ').trim();
+    const hyphenatedPrompt = promptBase.replace(/\s+/g, '-').slice(0, 40);
+
+    console.log('--- ULTRA-SAFE PROMPT ---');
+    console.log(hyphenatedPrompt);
+
+    const imageUrl = `https://image.pollinations.ai/prompt/${hyphenatedPrompt}?seed=${Math.floor(Math.random() * 100000)}&nologo=true&width=800&height=450`;
 
     return NextResponse.json({ imageUrl });
   } catch (error) {

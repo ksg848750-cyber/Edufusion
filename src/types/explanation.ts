@@ -15,6 +15,7 @@ export interface Explanation {
   analogy_breaks: string;
   summary: string;
   storyboard: string[];
+  storyboard_images?: string[];
   mapping: AnalogyMapping[];
   suggested_scene_image_prompt: string;
 }

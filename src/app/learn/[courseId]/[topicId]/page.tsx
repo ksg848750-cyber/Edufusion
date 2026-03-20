@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import InterestLens from '@/components/learning/InterestLens';
-import SceneExplainer from '@/components/learning/SceneExplainer';
+import UnifiedExplainer from '@/components/learning/UnifiedExplainer';
 import SceneSwitcher from '@/components/learning/SceneSwitcher';
 import VoicePlayer from '@/components/ai/VoicePlayer';
 import MentorDrawer from '@/components/ai/MentorDrawer';
@@ -13,6 +13,7 @@ import NbButton from '@/components/ui/NbButton';
 import NbCard from '@/components/ui/NbCard';
 import Navbar from '@/components/layout/Navbar';
 import TickerBar from '@/components/layout/TickerBar';
+import ThemeFlare from '@/components/learning/ThemeFlare';
 import { INTEREST_EMOJIS, INTEREST_LABELS } from '@/lib/utils';
 import type { Explanation } from '@/types/explanation';
 
@@ -46,6 +47,18 @@ export default function LearnPage() {
   const [mentorOpen, setMentorOpen] = useState(false);
   const [levelUpData, setLevelUpData] = useState<{ level: number; tier: string } | null>(null);
   const [showInterestPicker, setShowInterestPicker] = useState(false);
+  const [storyboardImages, setStoryboardImages] = useState<string[] | null>(null);
+  const [loadingStoryboard, setLoadingStoryboard] = useState(false);
+  const [sessionSeed] = useState(() => Math.floor(Math.random() * 999999));
+
+  // Sync theme to document for global variables
+  useEffect(() => {
+    if (activeInterest) {
+      document.documentElement.setAttribute('data-theme', activeInterest);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  }, [activeInterest]);
 
   // Fetch topic data
   useEffect(() => {
@@ -93,7 +106,8 @@ export default function LearnPage() {
 
     try {
       const token = await user.getIdToken();
-      const res = await fetch('/api/generate-subtopic-explanation', {
+      console.log('Fetching explanation for subtopic:', currentSubtopic.subtopicId);
+      const res = await fetch(`/api/generate-subtopic-explanation?t=${Date.now()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,10 +122,12 @@ export default function LearnPage() {
           mode: userProfile?.preferredMode || 'casual',
           language: userProfile?.language || 'english',
           specificity,
+          subtopicIndex: currentSubtopicIndex,
         }),
       });
 
       const data = await res.json();
+      console.log('Received explanation response:', data._cached ? 'FROM CACHE' : 'GENERATED FRESH');
       if (data.explanation) {
         setExplanation(data.explanation);
       }
@@ -127,11 +143,17 @@ export default function LearnPage() {
     setSelectedInterest(interest);
   };
 
+  // Auto-generate on subtopic change
+  useEffect(() => {
+    if (phase === 'lesson' && activeInterest && !explanation && !loading) {
+      generateExplanation(activeInterest);
+    }
+  }, [currentSubtopicIndex, activeInterest, phase, explanation, loading, generateExplanation]);
+
   const startLearning = () => {
     if (!selectedInterest) return;
     setActiveInterest(selectedInterest);
     setPhase('lesson');
-    generateExplanation(selectedInterest);
   };
 
   // Scene Switcher handlers
@@ -146,7 +168,8 @@ export default function LearnPage() {
   const handleSwitchInterest = (newInterest: string) => {
     setActiveInterest(newInterest);
     setShowInterestPicker(false);
-    generateExplanation(newInterest);
+    setExplanation(null);
+    setImageUrl('');
   };
 
   // Generate scene image
@@ -178,6 +201,54 @@ export default function LearnPage() {
       console.error('Failed to generate image:', e);
     } finally {
       setLoadingImage(false);
+    }
+  };
+
+  const handleGenerateStoryboard = async () => {
+    console.log("--- START STORYBOARD GENERATION ---");
+    if (!user || !explanation || !explanation.storyboard) {
+      console.log("MISSING DATA:", { user: !!user, hasExpl: !!explanation, hasStory: !!explanation?.storyboard });
+      return;
+    }
+    console.log("Frames to generate:", explanation.storyboard.length);
+    setLoadingStoryboard(true);
+    try {
+      const token = await user.getIdToken();
+      // Generate images one-by-one to respect Pollinations IP rate limits (max 1 concurrent)
+      const urls: string[] = [];
+      for (let i = 0; i < explanation.storyboard.length; i++) {
+        const frame = explanation.storyboard[i];
+        try {
+          const res = await fetch("/api/scene-image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({ 
+              sceneDescription: frame,
+              concept: currentSubtopic?.title || '',
+              interest: activeInterest,
+              sceneSource: explanation.scene_source
+            }),
+          });
+          const data = await res.json();
+          if (data.imageUrl) {
+            // Force the same seed for all frames to maintain likeness
+            const syncedUrl = data.imageUrl.replace(/seed=\d+/, `seed=${sessionSeed}`);
+            urls.push(syncedUrl);
+            setStoryboardImages([...urls]);
+          }
+          // LONGER DELAY (2.5s) to avoid "Too Many Requests" for the user's IP
+          await new Promise(r => setTimeout(r, 2500));
+        } catch (e) {
+          console.error(`Frame ${i} failed:`, e);
+        }
+      }
+    } catch (err) {
+      console.error("Storyboard generation failed", err);
+    } finally {
+      setLoadingStoryboard(false);
     }
   };
 
@@ -214,13 +285,10 @@ export default function LearnPage() {
 
     // Move to next subtopic
     if (currentSubtopicIndex < subtopics.length - 1) {
-      setCurrentSubtopicIndex(currentSubtopicIndex + 1);
       setExplanation(null);
       setImageUrl('');
-      // Re-generate with same interest
-      setTimeout(() => {
-        generateExplanation(activeInterest);
-      }, 100);
+      setStoryboardImages(null);
+      setCurrentSubtopicIndex(prev => prev + 1);
     } else {
       // Topic complete — go back to course
       router.push(`/course/${courseId}`);
@@ -229,12 +297,10 @@ export default function LearnPage() {
 
   const handlePrevSubtopic = () => {
     if (currentSubtopicIndex > 0) {
-      setCurrentSubtopicIndex(currentSubtopicIndex - 1);
       setExplanation(null);
       setImageUrl('');
-      setTimeout(() => {
-        generateExplanation(activeInterest);
-      }, 100);
+      setStoryboardImages(null);
+      setCurrentSubtopicIndex(prev => prev - 1);
     }
   };
 
@@ -290,18 +356,20 @@ export default function LearnPage() {
 
   // LESSON VIEW
   return (
-    <div className="relative overflow-hidden" style={{ background: 'var(--ink)', minHeight: '100vh' }}>
+    <div className="relative overflow-hidden nb-bg-grid transition-all duration-700" style={{ minHeight: '100vh', backgroundColor: 'var(--theme-bg)' }} data-theme={activeInterest}>
+      <ThemeFlare interest={activeInterest} />
       <Navbar />
       <TickerBar />
 
+      <ThemeFlare interest={activeInterest} />
 
-      {/* Top Bar: Minimal & Clean */}
+      <div className="nb-bg-grid fixed inset-0 z-0" style={{ backgroundColor: 'var(--theme-bg)' }} />
       <div className="relative z-10 px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="nb-mono flex items-center gap-2" style={{ fontSize: '12px', color: 'var(--chalk)', opacity: 0.6 }}>
-            {courseTitle} <span className="opacity-40">/</span> {topicTitle}
+          <div className="nb-mono flex items-center gap-2" style={{ fontSize: '11px', color: 'var(--theme-accent)', fontWeight: 'bold' }}>
+            {courseTitle.toUpperCase()} <span className="text-white/20">/</span> {topicTitle.toUpperCase()}
           </div>
-          <h2 className="nb-display mt-1" style={{ fontSize: '36px', color: 'var(--chalk)' }}>{currentSubtopic?.title}</h2>
+          <h2 className="nb-display mt-1 nb-glitch" style={{ fontSize: '42px', color: 'var(--theme-text)', letterSpacing: '0.05em' }}>{currentSubtopic?.title}</h2>
         </div>
 
         {/* Active Interest Pill */}
@@ -316,8 +384,8 @@ export default function LearnPage() {
             fontWeight: 'bold',
             border: 'var(--bd)',
             boxShadow: 'var(--sh-sm)',
-            background: 'var(--volt)',
-            color: 'var(--ink)',
+            background: 'var(--theme-accent)',
+            color: 'var(--theme-bg)',
             borderRadius: '0',
             cursor: 'pointer',
           }}
@@ -328,16 +396,15 @@ export default function LearnPage() {
 
       <div className="relative z-10 px-8 pb-32 max-w-[1400px] mx-auto">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Main Content: Floating White Card */}
+          {/* Main Content: High Contrast Card */}
           <div className="flex-1">
-            <NbCard hover={false} className="p-0 overflow-hidden" style={{ border: 'var(--bd)', background: 'var(--ink)' }}>
-              {/* Progress Tracker (Inside) */}
-              <div className="px-8 py-4 bg-black/20 border-bottom border-black/10 flex items-center gap-4">
-                 <span className="nb-mono" style={{ fontSize: '9px', fontWeight: 'bold' }}>PROGRESS</span>
-                 <div className="flex-1 nb-progress-track" style={{ height: '8px' }}>
-                    <div className="nb-progress-fill nb-progress-fill-plasma" style={{ width: `${((currentSubtopicIndex + 1) / Math.max(subtopics.length, 1)) * 100}%` }} />
-                 </div>
-                 <span className="nb-mono" style={{ fontSize: '9px' }}>{currentSubtopicIndex + 1}/{subtopics.length}</span>
+            <NbCard hover={false} className="p-0 overflow-hidden" variant="default" style={{ border: 'var(--theme-border)', background: 'var(--theme-bg)' }}>
+              {/* Progress Tracker (Vibrant) */}
+              <div className="px-8 py-5 bg-black/40 border-b-4 border-black flex items-center gap-4">
+                  <div className="flex-1 nb-progress-track" style={{ height: '12px', background: 'rgba(255,255,255,0.1)' }}>
+                    <div className="nb-progress-fill" style={{ width: `${((currentSubtopicIndex + 1) / Math.max(subtopics.length, 1)) * 100}%`, background: 'var(--theme-accent)', boxShadow: '0 0 15px var(--theme-accent)' }} />
+                  </div>
+                 <span className="nb-mono text-chalk" style={{ fontSize: '11px', fontWeight: 'bold' }}>{currentSubtopicIndex + 1} OF {subtopics.length}</span>
               </div>
 
               <div className="p-8">
@@ -357,13 +424,17 @@ export default function LearnPage() {
                   </div>
                 ) : explanation ? (
                   <div>
-                    <SceneExplainer
+                    <UnifiedExplainer
                       explanation={explanation}
                       interest={activeInterest}
-                      mode={userProfile.preferredMode || 'casual'}
+                      mode={(userProfile?.preferredMode as 'casual' | 'exam') || 'casual'}
                       onGenerateImage={handleGenerateImage}
+                      onGenerateStoryboard={handleGenerateStoryboard}
                       imageUrl={imageUrl}
+                      storyboardImages={storyboardImages || undefined}
                       loadingImage={loadingImage}
+                      loadingStoryboard={loadingStoryboard}
+                      isCourseMode={true}
                     />
 
                     {/* Scene Switcher: Now inside the card for continuity */}
@@ -385,12 +456,12 @@ export default function LearnPage() {
 
           {/* Right Panel: Floating Sidebar */}
           <div className="w-full lg:w-[320px] space-y-6">
-            <NbCard className="p-6" style={{ border: 'var(--bd)', background: 'var(--ink)' }}>
+            <NbCard className="p-6" variant="nova" style={{ border: 'var(--bd)', boxShadow: 'var(--sh-lg)' }}>
               <div className="space-y-6">
                 {/* Voice Player */}
                 {explanation && (
                   <div>
-                    <div className="nb-mono mb-3" style={{ fontSize: '9px', color: '#888', letterSpacing: '0.1em' }}>AUDIO GUIDE</div>
+                     <div className="nb-mono mb-3" style={{ fontSize: '9px', color: 'var(--ink)', fontWeight: 'bold', opacity: 0.6, letterSpacing: '0.1em' }}>AUDIO GUIDE</div>
                     <VoicePlayer
                       text={voiceText}
                       language={userProfile.language || 'english'}
@@ -410,30 +481,31 @@ export default function LearnPage() {
 
                 {/* Subtopic List */}
                 <div className="mt-8">
-                  <div className="nb-mono mb-4" style={{ fontSize: '9px', color: '#888', letterSpacing: '0.1em' }}>
+                   <div className="nb-mono mb-4" style={{ fontSize: '9px', color: 'var(--ink)', fontWeight: 'bold', opacity: 0.6, letterSpacing: '0.1em' }}>
                     CURRICULUM
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {subtopics.map((s, i) => (
                       <div
                         key={s.subtopicId}
-                        className="nb-mono py-3 px-4 transition-all cursor-pointer border-2"
+                        className="nb-mono py-4 px-4 transition-all cursor-pointer border-4 group"
                         style={{
-                          fontSize: '12px',
-                          borderColor: i === currentSubtopicIndex ? 'var(--volt)' : 'transparent',
-                          color: i === currentSubtopicIndex ? 'var(--ink)' : s.isCompleted ? 'var(--ion)' : '#999',
-                          background: i === currentSubtopicIndex ? 'var(--volt)' : s.isCompleted ? 'transparent' : 'transparent',
+                          fontSize: '11px',
+                          fontWeight: 'bold',
+                          borderColor: i === currentSubtopicIndex ? 'var(--theme-accent)' : 'black',
+                          color: i === currentSubtopicIndex ? 'var(--theme-bg)' : s.isCompleted ? 'var(--theme-accent)' : 'var(--theme-text)',
+                          background: i === currentSubtopicIndex ? 'var(--theme-accent)' : 'rgba(0,0,0,0.4)',
+                          transform: i === currentSubtopicIndex ? 'rotate(-1deg)' : 'none',
                         }}
                         onClick={() => {
                           setCurrentSubtopicIndex(i);
                           setExplanation(null);
                           setImageUrl('');
-                          setTimeout(() => generateExplanation(activeInterest), 100);
                         }}
                       >
                         <div className="flex items-center justify-between">
-                          <span>{i + 1}. {s.title}</span>
-                          {s.isCompleted && <span className="text-ion text-xs">✓</span>}
+                          <span>{String(i + 1).padStart(2, '0')}. {s.title.toUpperCase()}</span>
+                          {s.isCompleted && <span className="text-ion">✓</span>}
                         </div>
                       </div>
                     ))}
@@ -446,30 +518,30 @@ export default function LearnPage() {
       </div>
 
       {/* Bottom Navigation: Floating Pill */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-[600px] px-4">
-        <div className="bg-black/80 backdrop-blur-md border-[4px] border-black p-4 flex items-center justify-between shadow-2xl">
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-[650px] px-6">
+        <div className="bg-black border-[5px] border-black p-4 flex items-center justify-between shadow-[12px_12px_0_rgba(0,0,0,1)]">
           <NbButton
             variant="dark"
             disabled={currentSubtopicIndex === 0}
             onClick={handlePrevSubtopic}
-            style={{ borderRadius: '0', fontSize: '12px' }}
+            style={{ borderRadius: '0', fontSize: '14px', border: '3px solid var(--theme-text)', color: 'var(--theme-text)' }}
           >
-            ←
+            PREV
           </NbButton>
 
           <div className="flex flex-col items-center">
-            <span className="nb-mono text-[10px] font-bold opacity-40">CHAPTER PROGRESS</span>
-            <span className="nb-mono font-bold" style={{ fontSize: '14px' }}>
-              {currentSubtopicIndex + 1} <span className="opacity-30">/</span> {subtopics.length}
+            <span className="nb-mono text-volt text-[10px] font-bold">CHAPTER PROGRESS</span>
+            <span className="nb-mono font-bold text-white" style={{ fontSize: '16px' }}>
+              {currentSubtopicIndex + 1} <span className="text-white/30">/</span> {subtopics.length}
             </span>
           </div>
 
           {currentSubtopicIndex < subtopics.length - 1 ? (
-            <NbButton variant="volt" onClick={handleNextSubtopic} style={{ borderRadius: '0', padding: '0.75rem 2rem' }}>
-              NEXT →
+            <NbButton variant="default" onClick={handleNextSubtopic} style={{ borderRadius: '0', padding: '1rem 3rem', fontSize: '18px', background: 'var(--theme-accent)', color: 'var(--theme-bg)' }}>
+              NEXT STEP →
             </NbButton>
           ) : (
-            <NbButton variant="ion" onClick={handleNextSubtopic} style={{ borderRadius: '0', padding: '0.75rem 2rem' }}>
+            <NbButton variant="default" onClick={handleNextSubtopic} style={{ borderRadius: '0', padding: '1rem 3rem', fontSize: '18px', background: 'var(--theme-accent-secondary)', color: 'var(--theme-bg)' }}>
               FINISH ✓
             </NbButton>
           )}

@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth';
 import { generateSubtopicExplanationSchema } from '@/utils/validate';
-import { generateSubtopicPrompt } from '@/lib/prompt';
-import { callGroqJSON } from '@/lib/groq';
+import { generateSubtopicPrompt, SYSTEM_PERSONA } from '@/lib/prompt';
+import { callGroqJSON, MODEL_SMART } from '@/lib/groq';
 import { hashPrompt, getCached, setCached } from '@/lib/cache';
 import { adminDb } from '@/lib/firebase-admin';
 import type { Explanation } from '@/types/explanation';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,17 +36,24 @@ export async function POST(req: NextRequest) {
       mode,
       language,
       specificity,
+      subtopicIndex,
     } = result.data;
 
-    // Build cache hash
-    const cacheKey = `${subtopicTitle}|${interest}|${mode}|${language}|${specificity || ''}`;
+    // Build cache hash (v17: Storyboard Force Update)
+    const cacheKey = `${subtopicId}|${interest}|${mode}|${language}|${specificity || ''}|v17`;
     const hash = await hashPrompt(cacheKey);
+
+    console.log('--- GENERATE EXPLANATION V15 ---');
+    console.log('Subtopic:', subtopicTitle);
 
     // Check cache
     const cached = await getCached(hash);
     if (cached) {
-      return NextResponse.json({ explanation: cached, _cached: true });
+      console.log('CACHE HIT!');
+      const explanation = (cached as any).result || cached;
+      return NextResponse.json({ explanation, _cached: true });
     }
+    console.log('CACHE MISS - GENERATING FRESH...');
 
     // Generate via Groq
     const prompt = generateSubtopicPrompt(
@@ -53,10 +63,18 @@ export async function POST(req: NextRequest) {
       interest,
       mode,
       language,
-      specificity
+      specificity,
+      subtopicIndex
     );
 
-    const explanationData = await callGroqJSON<Explanation>(prompt);
+    const explanationData = await callGroqJSON<Explanation>(
+      prompt,
+      MODEL_SMART,
+      SYSTEM_PERSONA
+    );
+    console.log('--- ANALOGY CHOSEN V15 ---');
+    console.log('Scene:', explanationData.scene_source);
+    console.log('Hook:', explanationData.hook);
 
     // Save to cache
     await setCached(hash, {

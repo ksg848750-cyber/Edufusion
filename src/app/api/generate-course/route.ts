@@ -26,23 +26,20 @@ export async function POST(req: NextRequest) {
     const hasSyllabus = syllabusText && syllabusText.trim() !== '';
     const source: CourseSource = hasSyllabus ? 'syllabus_upload' : 'ai_generated';
 
-    // 3. Build prompt
     const promptLine = hasSyllabus
       ? `I have the following syllabus text:\n\n"${syllabusText}"\n\nGenerate a structured course based on this syllabus. Follow the exact order of units and topics. Every item must be included.`
-      : `Generate a comprehensive, well-structured course on: "${subject}". Cover all fundamental and important topics a student would need.`;
+      : `Generate a COMPREHENSIVE, deep, and academic course on: "${subject}". 
+         Structure it for a student who wants to go from zero to absolute mastery.`;
 
     const prompt = `${promptLine}
 
 CRITICAL RULES:
-- Generate 4-6 comprehensive units
-- Each unit: 3-5 topics
-- Each topic: 3-7 subtopics (granular, specific learning chunks)
-- ${hasSyllabus
-      ? 'Units MUST follow the exact order from the syllabus.'
-      : 'Order from fundamentals to advanced.'}
-- Unit 1 MUST begin with an "Introduction" topic
-- Subtopics must be specific enough for a 2-3 paragraph explanation each
-- DO NOT generate explanations — ONLY the structural curriculum
+1. PERSONA: You are a Senior Curriculum Architect at a top university.
+2. GRANULARITY: If a topic has distinct "Types", "Levels", or "Categories" (e.g. Types of OS), DO NOT CLUMP THEM. Each type (Batch, Time-sharing, etc.) MUST be its own subtopic.
+3. STRUCTURE: 4-6 units. Each unit: 3-5 topics. Each topic: 3-8 granular subtopics.
+4. ORDER: ${hasSyllabus ? 'Exact syllabus order.' : 'Logical progression from fundamentals to advanced.'}
+5. INTRO: Unit 1 Topic 1 must be a thorough "Foundations & Definition" section.
+6. NO GLOSSING: Do not skip complex sub-concepts. Every technical essential must have a subtopic.
 
 Return ONLY valid JSON matching this schema:
 {

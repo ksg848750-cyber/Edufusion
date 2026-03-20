@@ -9,7 +9,7 @@ if (!process.env.GROQ_API_KEY) {
 }
 
 export const MODEL_FAST = 'llama-3.1-8b-instant';
-export const MODEL_SMART = 'llama-3.1-8b-instant';
+export const MODEL_SMART = 'llama-3.3-70b-versatile';
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

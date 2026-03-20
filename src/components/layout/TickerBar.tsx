@@ -15,11 +15,11 @@ export default function TickerBar() {
   ];
 
   return (
-    <div className="nb-ticker">
+    <div className="nb-ticker" style={{ background: 'var(--theme-accent)', color: 'var(--theme-bg)' }}>
       <div className="nb-ticker-inner">
         {[...items, ...items].map((item, i) => (
-          <span key={i}>
-            {item} //
+          <span key={i} className="nb-display" style={{ fontSize: '14px', fontWeight: 'bold' }}>
+            {item} <span className="opacity-30">⚡</span>
           </span>
         ))}
       </div>

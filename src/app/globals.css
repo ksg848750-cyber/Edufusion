@@ -20,30 +20,186 @@
    NEO BRUTALISM × CINEMATIC DESIGN SYSTEM
    ═══════════════════════════════════════════════════════════ */
 
+/* FORCE REFRESH v9.1.5 */
 :root {
   /* Base */
-  --ink: #000000;
-  --chalk: #FFFFFF;
-  --bg: #0A0A0A;
+  --ink: #0A0A0A;
+  --chalk: #F8F8F8;
+  --bg: #0D0D11;
 
-  /* Saturated Neo Brutalist Accents */
-  --volt: #D4FF00;    /* Toxic Green */
-  --plasma: #FF2D78;  /* Cyber Pink */
-  --ion: #00FFD1;     /* Electric Teal */
-  --solar: #FF8C00;    /* Neon Orange */
-  --nova: #7B2FFF;    /* Acid Purple */
+  /* Saturated High-Energy Neo Brutalist Accents */
+  --volt: #DBFF00;      /* Electric Lime */
+  --plasma: #FF007A;    /* Cyber Magenta */
+  --ion: #00F5FF;       /* Cyan Surge */
+  --solar: #FF7A00;     /* Blood Orange */
+  --nova: #9D00FF;      /* Acid Purple */
+  --electric-blue: #0066FF;
 
   /* Rigid & Aggressive Brutalist */
   --radius: 0px;
   --bd: 4px solid #000000;
   --sh: 8px 8px 0 #000000;
-  --sh-lg: 12px 12px 0 #000000;
+  --sh-lg: 14px 14px 0 #000000;
   --sh-sm: 4px 4px 0 #000000;
 
   /* Typography */
   --ff-display: 'Bebas Neue', sans-serif;
   --ff-body: 'Space Grotesk', sans-serif;
   --ff-mono: 'DM Mono', monospace;
+
+  /* Theme Defaults (Neo Brutalist) */
+  --theme-accent: var(--volt);
+  --theme-bg: var(--bg);
+  --theme-text: var(--chalk);
+  --theme-border: var(--bd);
+  --theme-shadow: var(--sh);
+}
+
+/* ── INTEREST THEMES ────────────────────────────────────── */
+
+[data-theme="cricket"] {
+  --theme-accent: #00FF44;
+  --theme-accent-rgb: 0, 255, 68;
+  --theme-accent-secondary: #FFFFFF;
+  --theme-accent-secondary-rgb: 255, 255, 255;
+  --theme-accent-tertiary: #FFD700;
+  --theme-accent-tertiary-rgb: 255, 215, 0;
+  --theme-bg: #052205;
+  --theme-text: #FFFFFF;
+  --theme-border: 4px solid #FFFFFF;
+  --theme-shadow: 8px 8px 0 #005500;
+}
+
+[data-theme="movies"] {
+  --theme-accent: #FFD700;
+  --theme-accent-rgb: 255, 215, 0;
+  --theme-accent-secondary: #FF4444;
+  --theme-accent-secondary-rgb: 255, 68, 68;
+  --theme-accent-tertiary: #FFFFFF;
+  --theme-accent-tertiary-rgb: 255, 255, 255;
+  --theme-bg: #1A1A1A;
+  --theme-text: #F8F8F8;
+  --theme-border: 4px solid #FFD700;
+}
+
+[data-theme="anime"] {
+  --theme-accent: #FF00E5;
+  --theme-accent-rgb: 255, 0, 229;
+  --theme-accent-secondary: #00F5FF;
+  --theme-accent-secondary-rgb: 0, 245, 255;
+  --theme-accent-tertiary: #FFFF00;
+  --theme-accent-tertiary-rgb: 255, 255, 0;
+  --theme-bg: #110022;
+  --theme-text: #FFFFFF;
+  --theme-border: 4px solid #FF00E5;
+}
+
+[data-theme="gaming"] {
+  --theme-accent: #00FF9D;
+  --theme-accent-rgb: 0, 255, 157;
+  --theme-accent-secondary: #BC00FF;
+  --theme-accent-secondary-rgb: 188, 0, 255;
+  --theme-accent-tertiary: #FF0055;
+  --theme-accent-tertiary-rgb: 255, 0, 85;
+  --theme-bg: #0D001A;
+  --theme-text: #FFFFFF;
+  --theme-border: 4px solid #00FF9D;
+}
+
+[data-theme="football"] {
+  --theme-accent: #3B82F6;
+  --theme-accent-rgb: 59, 130, 246;
+  --theme-accent-secondary: #FFFFFF;
+  --theme-accent-secondary-rgb: 255, 255, 255;
+  --theme-accent-tertiary: #FFCC00;
+  --theme-accent-tertiary-rgb: 255, 204, 0;
+  --theme-bg: #061A06;
+  --theme-text: #FFFFFF;
+  --theme-border: 4px solid #FFFFFF;
+}
+
+[data-theme="f1"] {
+  --theme-accent: #FF0000;
+  --theme-accent-rgb: 255, 0, 0;
+  --theme-accent-secondary: #FFFFFF;
+  --theme-accent-secondary-rgb: 255, 255, 255;
+  --theme-accent-tertiary: #FFD700;
+  --theme-accent-tertiary-rgb: 255, 215, 0;
+  --theme-bg: #1A1A1A;
+  --theme-text: #FFFFFF;
+  --theme-border: 4px solid #FFFFFF;
+  --theme-shadow: 8px 8px 0 #550000;
+}
+
+[data-theme="music"] {
+  --theme-accent: #7000FF;
+  --theme-accent-rgb: 112, 0, 255;
+  --theme-accent-secondary: #00F5FF;
+  --theme-accent-secondary-rgb: 0, 245, 255;
+  --theme-accent-tertiary: #FF00BD;
+  --theme-accent-tertiary-rgb: 255, 0, 189;
+  --theme-bg: #0A0A0A;
+  --theme-text: #FFFFFF;
+}
+
+[data-theme="tvshows"] {
+  --theme-accent: #FFAA00;
+  --theme-accent-rgb: 255, 170, 0;
+  --theme-accent-secondary: #FF2200;
+  --theme-accent-secondary-rgb: 255, 34, 0;
+  --theme-accent-tertiary: #FFFFFF;
+  --theme-accent-tertiary-rgb: 255, 255, 255;
+  --theme-bg: #1A1A1A;
+  --theme-text: #FFFFFF;
+}
+
+/* ── INTEREST BACKGROUNDS & FLARE ───────────────────────── */
+
+[data-theme="cricket"] .nb-bg-grid {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.1) 0%, transparent 70%);
+  background-size: 60px 60px, 60px 60px, 100% 100%;
+}
+
+[data-theme="anime"] .nb-bg-grid {
+  background-image: 
+    linear-gradient(45deg, rgba(255, 0, 229, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 0, 229, 0.05) 50%, rgba(255, 0, 229, 0.05) 75%, transparent 75%, transparent);
+  background-size: 100px 100px;
+  animation: anime-speed-lines 20s linear infinite;
+}
+
+@keyframes anime-speed-lines {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 1000px; }
+}
+
+[data-theme="gaming"] .nb-bg-grid {
+  background-image: 
+    linear-gradient(rgba(0, 255, 157, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 157, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  perspective: 1000px;
+}
+
+[data-theme="f1"] .nb-bg-grid {
+  background-image: 
+    conic-gradient(at 0 0, transparent 270deg, rgba(255, 255, 255, 0.05) 0deg);
+  background-size: 40px 40px;
+}
+
+[data-theme="music"] .nb-bg-grid {
+  background: 
+    radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+}
+
+[data-theme="music"] .nb-bg-grid::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 20px, rgba(255,255,255,0.02) 21px, transparent 22px);
+  pointer-events: none;
 }
 
 /* ── GLOBAL RESETS ──────────────────────────────────────── */
@@ -303,6 +459,7 @@ body {
 .nb-btn-ion { background: var(--ion); color: var(--ink); }
 .nb-btn-solar { background: var(--solar); color: #fff; }
 .nb-btn-nova { background: var(--nova); color: #fff; }
+.nb-btn-blue { background: var(--electric-blue); color: #fff; }
 .nb-btn-dark { background: var(--ink); color: var(--chalk); }
 .nb-btn-chalk { background: var(--chalk); color: var(--ink); }
 
@@ -710,10 +867,19 @@ body {
 }
 
 .nb-bg-grid {
-  background-image: linear-gradient(rgba(212, 255, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(212, 255, 0, 0.03) 1px, transparent 1px);
-  background-size: 30px 30px;
+  background-color: var(--theme-bg);
+  background-image: 
+    linear-gradient(rgba(0, 245, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 245, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
+
+.bg-nb-volt { background-color: var(--volt) !important; color: var(--ink) !important; }
+.bg-nb-plasma { background-color: var(--plasma) !important; color: #fff !important; }
+.bg-nb-ion { background-color: var(--ion) !important; color: var(--ink) !important; }
+.bg-nb-solar { background-color: var(--solar) !important; color: #fff !important; }
+.bg-nb-nova { background-color: var(--nova) !important; color: #fff !important; }
+.bg-nb-blue { background-color: var(--electric-blue) !important; color: #fff !important; }
 
 .nb-scanline-overlay {
   position: absolute;
@@ -791,6 +957,76 @@ body {
   }
 }
 
+/* ── 3D CUBE ────────────────────────────────────────────── */
+
+.nb-cube-scene {
+  width: 120px;
+  height: 120px;
+  perspective: 600px;
+}
+
+.nb-cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: nb-cube-rotate 10s linear infinite;
+}
+
+.nb-cube-face {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border: 4px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ff-display);
+  font-size: 64px;
+  font-weight: 900;
+  background: var(--volt);
+  color: var(--ink);
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
+}
+
+.nb-cube-front  { transform: rotateY(  0deg) translateZ(60px); }
+.nb-cube-back   { transform: rotateY(180deg) translateZ(60px); }
+.nb-cube-top    { transform: rotateX( 90deg) translateZ(60px); }
+.nb-cube-bottom { transform: rotateX(-90deg) translateZ(60px); }
+
+@keyframes nb-cube-rotate {
+  from { transform: rotateX(0deg) rotateY(0deg); }
+  to { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+/* ── LAYOUT EXTRAS ──────────────────────────────────────── */
+
+.nb-page-hero {
+  padding: 4rem 0;
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+
+.nb-stat-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.nb-stat-number {
+  font-family: var(--ff-display);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.nb-stat-label {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
 
 .nb-bouncy {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -818,4 +1054,40 @@ body {
 
 .nb-animate-float {
   animation: nb-float-joy 6s ease-in-out infinite;
+}
+
+@keyframes nb-ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes nb-spin3d {
+  from { transform: rotateX(0) rotateY(0); }
+  to { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+@keyframes nb-orbit {
+  from { transform: translate(-50%, -50%) rotate(0deg) translateX(40px) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg) translateX(40px) rotate(-360deg); }
+}
+
+@keyframes nb-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes nb-pulse-shadow {
+  0% { box-shadow: 0 0 0 0 rgba(var(--theme-accent-rgb), 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(var(--theme-accent-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--theme-accent-rgb), 0); }
+}
+
+@keyframes nb-waveform {
+  0%, 100% { height: 8px; }
+  50% { height: 24px; }
+}
+
+@keyframes nb-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

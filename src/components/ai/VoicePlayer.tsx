@@ -87,7 +87,13 @@ export default function VoicePlayer({ text, language = 'english' }: VoicePlayerP
 
   return (
     <div>
-      <NbButton variant="nova" size="sm" onClick={play} disabled={loading}>
+      <NbButton 
+        variant="default" 
+        size="sm" 
+        onClick={play} 
+        disabled={loading}
+        style={{ background: 'var(--theme-accent-secondary)', color: 'var(--theme-bg)' }}
+      >
         {loading ? '⏳ Loading...' : playing ? '⏹ STOP' : '🔊 HEAR IT'}
       </NbButton>
 
@@ -97,7 +103,7 @@ export default function VoicePlayer({ text, language = 'english' }: VoicePlayerP
             <div
               key={i}
               className="nb-waveform-bar"
-              style={{ animationDelay: `${i * 0.1}s` }}
+              style={{ animationDelay: `${i * 0.1}s`, background: 'var(--theme-accent-secondary)' }}
             />
           ))}
         </div>
