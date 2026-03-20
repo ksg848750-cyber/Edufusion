@@ -24,7 +24,7 @@ return NextResponse.json(
 
     // 3. Check Cache First (v17: Storyboard Force Update)
     const prompt = generateExplanationPrompt(topic, interest, mode, language, specificContext);
-    const hash = await hashPrompt(prompt + "|v17");
+    const hash = await hashPrompt(prompt + "|v19");
     
     const cachedExplanation = await getCached(hash);
     if (cachedExplanation) {

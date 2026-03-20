@@ -248,20 +248,36 @@ function ExplainPage() {
           </p>
 
           {/* Concept Input */}
-          <div className="mb-6">
-            <label className="nb-mono block mb-2" style={{ fontSize: '10px', color: '#888', letterSpacing: '0.1em' }}>
-              WHAT DO YOU WANT TO LEARN?
-            </label>
-            <input
-              type="text"
-              className="nb-input w-full"
-              placeholder="e.g. Deadlocks, Recursion, Supply & Demand, Photosynthesis..."
-              value={concept}
-              onChange={(e) => setConcept(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleExplain()}
-              autoFocus
-              suppressHydrationWarning
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="nb-mono block mb-2" style={{ fontSize: '10px', color: '#888', letterSpacing: '0.1em' }}>
+                WHAT DO YOU WANT TO LEARN?
+              </label>
+              <input
+                type="text"
+                className="nb-input w-full"
+                placeholder="e.g. Deadlocks, Recursion..."
+                value={concept}
+                onChange={(e) => setConcept(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleExplain()}
+                autoFocus
+                suppressHydrationWarning
+              />
+            </div>
+            <div>
+              <label className="nb-mono block mb-2" style={{ fontSize: '10px', color: '#888', letterSpacing: '0.1em' }}>
+                SPECIFIC SCENE (OPTIONAL)
+              </label>
+              <input
+                type="text"
+                className="nb-input w-full"
+                placeholder="e.g. In The Office, F1 Pitstop..."
+                value={specificContext}
+                onChange={(e) => setSpecificContext(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleExplain()}
+                suppressHydrationWarning
+              />
+            </div>
           </div>
 
           {/* Interest Picker */}
@@ -406,20 +422,49 @@ function ExplainPage() {
             </NbButton>
           </div>
 
-        /* Explanation Content */
         ) : explanation ? (
-          <UnifiedExplainer
-            explanation={explanation as any}
-            interest={activeInterest}
-            mode={mode}
-            onRegenerate={generate}
-            onGenerateImage={handleGenerateImage}
-            onGenerateStoryboard={handleGenerateStoryboard}
-            imageUrl={imageUrl}
-            storyboardImages={storyboardImages || undefined}
-            loadingImage={loadingImage}
-            loadingStoryboard={loadingStoryboard}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <UnifiedExplainer
+                explanation={explanation as any}
+                interest={activeInterest}
+                mode={mode}
+                onRegenerate={(specificity) => generate(activeInterest, specificity)}
+                onGenerateImage={handleGenerateImage}
+                onGenerateStoryboard={handleGenerateStoryboard}
+                imageUrl={imageUrl}
+                storyboardImages={storyboardImages || undefined}
+                loadingImage={loadingImage}
+                loadingStoryboard={loadingStoryboard}
+              />
+            </div>
+            <div className="space-y-6">
+              <NbCard variant="plasma" className="p-6 border-4">
+                <label className="nb-mono block mb-3" style={{ fontSize: '10px', color: 'var(--ink)', fontWeight: 'bold' }}>
+                  TRY ANOTHER SPECIFIC SCENE?
+                </label>
+                <div className="flex flex-col gap-3">
+                  <input
+                    type="text"
+                    className="nb-input w-full text-xs"
+                    style={{ background: 'white', color: 'black' }}
+                    placeholder="e.g. Describe it like a bank heist..."
+                    value={specificContext}
+                    onChange={(e) => setSpecificContext(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && generate(activeInterest, specificContext)}
+                  />
+                  <NbButton 
+                    variant="dark" 
+                    size="sm" 
+                    onClick={() => generate(activeInterest, specificContext)}
+                    className="w-full"
+                  >
+                    REGENERATE SCENE →
+                  </NbButton>
+                </div>
+              </NbCard>
+            </div>
+          </div>
         ) : null}
       </div>
     </main>

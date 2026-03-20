@@ -98,9 +98,23 @@ export default function UnifiedExplainer({
               <div className="relative group">
                 <div className="absolute -inset-1 blur opacity-25 group-hover:opacity-50 transition duration-1000" style={{ background: 'var(--theme-accent)' }}></div>
                 <div className="relative p-7 border-4 border-black bg-black/60" style={{ boxShadow: '4px 4px 0 var(--theme-accent)' }}>
-                  <p className="nb-mono relative z-10 leading-relaxed text-white/90" style={{ fontSize: '15px', whiteSpace: 'pre-wrap' }}>
-                    {explanation.scene}
-                  </p>
+                  <div className="space-y-4">
+                    {explanation.scene?.split(/\n|\r\n/).filter(line => line.trim().length > 5).map((para, i) => {
+                      const cleanPara = para.replace(/^\d+\.\s*/, '').trim();
+                      if (!cleanPara) return null;
+                      
+                      return (
+                        <div key={i} className="flex gap-4 group">
+                          <div className="nb-mono text-volt/40 group-hover:text-volt transition-colors text-[10px] font-bold pt-1">
+                            {String(i + 1).padStart(2, '0')}
+                          </div>
+                          <p className="nb-mono text-white/90 leading-relaxed flex-1" style={{ fontSize: '15px' }}>
+                            {cleanPara}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
                   
                   {/* Image Trigger */}
                   {onGenerateImage && (
@@ -173,43 +187,60 @@ export default function UnifiedExplainer({
             {/* 4. DEEP DIVE */}
             <section className="nb-fade-in">
               <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--theme-accent)', color: 'var(--theme-bg)', fontWeight: 'bold' }}>
-                THE MASTERCLASS
+                THE MASTERCLASS (STEP-BY-STEP)
               </span>
-              <div className="mt-6 space-y-6">
-                {explanation.deep_dive?.split("\n\n").filter(Boolean).map((para, i) => (
-                  <div 
-                    key={i} 
-                    className="p-7 border-2 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-300"
-                    style={{ borderLeft: '4px solid var(--theme-accent)' }}
-                  >
-                    <p className="nb-mono" style={{ fontSize: '15px', color: 'var(--theme-text)', lineHeight: 1.9 }}>
-                      {para}
-                    </p>
-                  </div>
-                ))}
+              <div className="mt-6 space-y-4">
+                {explanation.deep_dive?.split(/\n|\r\n/).filter(line => line.trim().length > 5).map((para, i) => {
+                  const cleanPara = para.replace(/^\d+\.\s*/, '').trim();
+                  if (!cleanPara) return null;
+                  
+                  return (
+                    <div 
+                      key={i} 
+                      className="group relative p-6 border-2 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-300"
+                      style={{ borderLeft: '4px solid var(--theme-accent)' }}
+                    >
+                      <div className="flex gap-4">
+                        <div className="nb-display text-volt opacity-20 group-hover:opacity-100 transition-opacity text-2xl leading-none">
+                          {String(i + 1).padStart(2, '0')}
+                        </div>
+                        <p className="nb-mono flex-1" style={{ fontSize: '14px', color: 'var(--theme-text)', lineHeight: 1.6 }}>
+                          {cleanPara}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </section>
 
-            {/* 5. MAPPING */}
-            <section className="nb-fade-in pt-8 border-t-2 border-white/5">
-              <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--theme-accent-secondary)', color: 'var(--theme-bg)', fontWeight: 'bold' }}>
-                CONCEPT CORRELATION
-              </span>
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {explanation.mapping?.map((item, id) => (
-                  <div key={id} className="flex border-2 border-white/10 overflow-hidden">
-                    <div className="nb-mono px-4 py-3 border-r-2 border-white/10 flex items-center font-bold text-[11px] min-w-[140px]" style={{ background: 'rgba(var(--theme-accent-rgb), 0.1)', color: 'var(--theme-accent)' }}>
-                      {item.concept.toUpperCase()}
-                    </div>
-                    <div className="bg-black/40 text-white/70 nb-mono px-4 py-3 text-[11px] flex items-center">
-                      {item.scene_element}
-                    </div>
+            {/* Divider */}
+            <div className="pt-8 border-t-2 border-white/5" />
+          </div>
+        </NbCard>
+
+        {/* 5. CONCEPT MAPPER (Now Prominent) */}
+        {explanation.mapping && explanation.mapping.length > 0 && (
+          <section className="nb-fade-in">
+            <NbCard variant="default" className="p-0 overflow-hidden" style={{ border: 'var(--theme-border)', background: 'var(--theme-bg)', boxShadow: 'var(--theme-shadow)' }}>
+              <div className="border-b-4 border-black px-6 py-3" style={{ background: 'var(--theme-accent-secondary)' }}>
+                <span className="nb-mono text-black font-bold text-[11px] tracking-thinner uppercase">
+                   The Concept Bridge (Analogy Mapper)
+                </span>
+              </div>
+              <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {explanation.mapping.map((item, id) => (
+                  <div key={id} className="relative group p-4 border-2 border-white/10 hover:border-volt/50 transition-colors bg-white/[0.02]">
+                    <div className="nb-mono text-volt text-[9px] font-bold mb-2 uppercase tracking-widest opacity-60">TECHNICAL TERM</div>
+                    <div className="nb-display text-white text-lg mb-4">{item.concept}</div>
+                    <div className="nb-mono text-[#888] text-[9px] font-bold mb-2 uppercase tracking-widest opacity-60">SCENE ELEMENT</div>
+                    <div className="nb-mono text-chalk text-xs bg-black/40 p-3 border-l-2 border-volt">{item.scene_element}</div>
                   </div>
                 ))}
               </div>
-            </section>
-          </div>
-        </NbCard>
+            </NbCard>
+          </section>
+        )}
 
         {/* Storyboard Frames */}
         {explanation.storyboard && (

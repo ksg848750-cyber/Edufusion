@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     } = result.data;
 
     // Build cache hash (v17: Storyboard Force Update)
-    const cacheKey = `${subtopicId}|${interest}|${mode}|${language}|${specificity || ''}|v17`;
+    const cacheKey = `${subtopicId}|${interest}|${mode}|${language}|${specificity || ''}|v19`;
     const hash = await hashPrompt(cacheKey);
 
     console.log('--- GENERATE EXPLANATION V15 ---');

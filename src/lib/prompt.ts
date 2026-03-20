@@ -17,8 +17,8 @@ Your goal is to make complex topics feel like a simple, beautiful story through 
 RULES:
 1. ALWAYS use a REAL, specific, named scene from the user's interest lens.
 2. Narrative first, but the technical CORE is the priority. Do not gloss over details.
-3. Be laser-focused on the specific sub-concept. If teaching "Types of OS", you must explain EACH major type (Batch, Time-sharing, Distributed, etc.) in the deep dive.
-4. Language must be elegant Grade 6-8 English. Punchy and cinematic.
+3. BE CONCISE: Use short sentences. Avoid long paragraphs. Use numbered steps for technical parts.
+4. Language must be elegant Grade 6-8 English. Simple, sweet, and punchy.
 5. NO ALL CAPS in your output (except labels if needed).
 6. Always return valid JSON only.
 7. If the topic is about 'History', your story must be a TIMELINE of events. If it's about 'Evolution', focus on the UPGRADES and what changed.
@@ -54,9 +54,9 @@ ${specificity ? `SPECIFICITY: "${specificity}"` : ''}
 
 STRUCTURE:
 BEAT 1 - THE HOOK: A beautiful opening line starting with "Imagine..."
-BEAT 2 - THE SCENE: Vivid recount of a real, named scene in 3-5 sentences.
+BEAT 2 - THE SCENE: A series of 3-5 short, vivid steps (MAX 2 sentences each) that recount a real, named scene. Use numbered steps.
 BEAT 3 - THE TWIST: One link sentence.
-BEAT 4 - THE DEEP DIVE: A high-density technical breakdown of "${topic}". Explain it from the ground up. If there are types, variants, or components, DESCRIBE THEM ALL UNFLINCHINGLY. 3-4 deep paragraphs.
+BEAT 4 - THE DEEP DIVE: A series of 3-5 short, punchy, numbered steps (MAX 2 sentences each) that break down "${topic}" from the ground up. If there are types, variants, or components, DESCRIBE THEM ALL CONCISELY in these steps. Each step MUST directly correlate to a step in the story.
 BEAT 5 - THE DEFINITION: Clear textbook definition and essential technical terms.
 BEAT 6 - LIMITS: Where analogy breaks.
 BEAT 7 - SUMMARY: One final punchy sentence.
