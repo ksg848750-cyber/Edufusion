@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
       subtopicIndex,
     } = result.data;
 
-    // Build cache hash (v17: Storyboard Force Update)
-    const cacheKey = `${subtopicId}|${interest}|${mode}|${language}|${specificity || ''}|v19`;
+    // Build cache hash (v21: Structured Arrays Refactor)
+    const cacheKey = `${subtopicId}|${interest}|${mode}|${language}|${specificity || ''}|v21`;
     const hash = await hashPrompt(cacheKey);
 
     console.log('--- GENERATE EXPLANATION V15 ---');
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       mode,
       language,
       specificity: specificity || '',
-      scene: explanationData.scene || '',
+      scene: explanationData.scene || [],
       sceneSource: explanationData.scene_source || '',
       result: explanationData as unknown as Record<string, unknown>,
     });

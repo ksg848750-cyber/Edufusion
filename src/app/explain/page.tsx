@@ -12,6 +12,8 @@ import type { ExplanationResponse } from "@/types/explanation";
 import UnifiedExplainer from "@/components/learning/UnifiedExplainer";
 import VoicePlayer from "@/components/ai/VoicePlayer";
 import ThemeFlare from "@/components/learning/ThemeFlare";
+import MentorDrawer from "@/components/ai/MentorDrawer";
+import { MessageCircle } from "lucide-react";
 
 export default function ExplainPageWrapper() {
   return (
@@ -49,6 +51,7 @@ function ExplainPage() {
   const [storyboardImages, setStoryboardImages] = useState<string[] | null>(null);
   const [loadingStoryboard, setLoadingStoryboard] = useState(false);
   const [sessionSeed] = useState(() => Math.floor(Math.random() * 999999));
+  const [mentorOpen, setMentorOpen] = useState(false);
 
   // Use interests from user profile, fallback to defaults
   const availableInterests = userProfile?.interests?.length
@@ -131,7 +134,9 @@ function ExplainPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ 
-          sceneDescription: (explanation as any).scene,
+          sceneDescription: Array.isArray((explanation as any).scene) 
+            ? (explanation as any).scene.join(" ") 
+            : (explanation as any).scene,
           concept: concept,
           interest: activeInterest,
           sceneSource: (explanation as any).scene_source
@@ -364,7 +369,7 @@ function ExplainPage() {
             {explanation && (
               <div className="w-64">
                 <VoicePlayer
-                  text={(explanation as any).hook + ". " + (explanation as any).scene + ". " + (explanation as any).twist + ". " + (explanation as any).deep_dive}
+                  text={`${explanation.hook}. ${Array.isArray(explanation.scene) ? explanation.scene.join(". ") : explanation.scene}. ${explanation.twist}. ${Array.isArray(explanation.deep_dive) ? explanation.deep_dive.join(". ") : explanation.deep_dive}`}
                   language={language}
                 />
               </div>
@@ -463,9 +468,30 @@ function ExplainPage() {
                   </NbButton>
                 </div>
               </NbCard>
+
+              {/* AI Mentor Button */}
+              <NbButton
+                variant="nova"
+                className="w-full py-6 flex items-center justify-center gap-3 group"
+                onClick={() => setMentorOpen(true)}
+              >
+                <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <div className="text-left">
+                  <div className="nb-mono text-[9px] opacity-60 leading-none mb-1 uppercase tracking-tighter">Live Guidance</div>
+                  <div className="nb-display text-base leading-none">CHAT WITH MENTOR</div>
+                </div>
+              </NbButton>
             </div>
           </div>
         ) : null}
+
+        {/* Global Mentor Drawer */}
+        <MentorDrawer
+          subtopicTitle={concept}
+          activeInterest={activeInterest}
+          isOpen={mentorOpen}
+          onClose={() => setMentorOpen(false)}
+        />
       </div>
     </main>
   );

@@ -54,22 +54,26 @@ ${specificity ? `SPECIFICITY: "${specificity}"` : ''}
 
 STRUCTURE:
 BEAT 1 - THE HOOK: A beautiful opening line starting with "Imagine..."
-BEAT 2 - THE SCENE: A series of 3-5 short, vivid steps (MAX 2 sentences each) that recount a real, named scene. Use numbered steps.
+BEAT 2 - THE SCENE: A series of 4-8 short, vivid steps (MAX 2 sentences each) that recount a real, named scene. 
 BEAT 3 - THE TWIST: One link sentence.
-BEAT 4 - THE DEEP DIVE: A series of 3-5 short, punchy, numbered steps (MAX 2 sentences each) that break down "${topic}" from the ground up. If there are types, variants, or components, DESCRIBE THEM ALL CONCISELY in these steps. Each step MUST directly correlate to a step in the story.
+BEAT 4 - THE DEEP DIVE: A series of 4-8 short, punchy steps (MAX 2 sentences each) that break down "${topic}" from the ground up from first principles.
+CRITICAL EXHAUSTIVENESS: If "${topic}" refers to a specific list of conditions, types, variants, or rules (e.g. Deadlock Conditions, OSI Layers, ACID, SOLID), you MUST dedicate EXACTLY ONE STEP to EACH ITEM in that list. DO NOT omit any. Explain them ALL.
+Prioritize technical completeness over the story mapping.
 BEAT 5 - THE DEFINITION: Clear textbook definition and essential technical terms.
 BEAT 6 - LIMITS: Where analogy breaks.
 BEAT 7 - SUMMARY: One final punchy sentence.
 
 ${langInstr}
 
-Return ONLY this JSON structure:
+Return ONLY this JSON structure. 
+IMPORTANT: "scene" and "deep_dive" MUST BE ARRAYS OF STRINGS. Each step must be a separate element in the array. NO numbered prefixes (e.g., use "State is saved" instead of "1. State is saved").
+
 {
   "scene_source": "string",
   "hook": "Imagine...",
-  "scene": "string",
+  "scene": ["step 1", "step 2", "step 3"],
   "twist": "string",
-  "deep_dive": "string",
+  "deep_dive": ["step 1", "step 2", "step 3"],
   "technical": "string",
   "key_points": ["point 1", "point 2"],
   "analogy_works": "string",
@@ -78,7 +82,8 @@ Return ONLY this JSON structure:
   "storyboard": ["frame 1", "frame 2", "frame 3", "frame 4"],
   "mapping": [{"concept": "term", "scene_element": "story part"}],
   "suggested_scene_image_prompt": "string"
-}`;
+}
+`;
 }
 
 export function generateSubtopicPrompt(
@@ -102,8 +107,43 @@ export function generateCoursePrompt(subject: string, syllabusText?: string): st
 export function generateQuizPrompt(t: string[], i: string, m: string): string {
   return `Generate 5 quiz questions about: ${t.join(', ')} in ${i} lens. JSON only.`;
 }
-export function generateMentorPrompt(c: any): string {
-  return `You are a mentor for "${c.subtopicTitle}". Use ${c.activeInterest}. Response in JSON.`;
+export function generateMentorPrompt(c: {
+  subtopicTitle: string;
+  topicTitle?: string;
+  courseTitle?: string;
+  activeInterest: string;
+  message: string;
+  last8Messages: { role: string; content: string }[];
+  chatSummary?: string;
+  language?: string;
+}): string {
+  const context = c.chatSummary ? `Previous Context: ${c.chatSummary}` : '';
+  const history = c.last8Messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n');
+  
+  return `You are "The Master Mentor", a world-class tutor. 
+Your goal is to guide the student through "${c.subtopicTitle}" using their interest in "${c.activeInterest}".
+
+CURRENT CONTEXT:
+- Topic: ${c.subtopicTitle} ${c.topicTitle ? `(Part of ${c.topicTitle})` : ''}
+- Interest Lens: ${c.activeInterest}
+- Language: ${c.language || 'English'}
+
+${context}
+
+CONVERSATION HISTORY:
+${history}
+
+STUDENT'S LATEST MESSAGE: "${c.message}"
+
+GUIDELINES:
+1. BE CONVERSATIONAL: If the student says "hi", "hello", or just greets you, greet them back warmly and ask how you can help them with ${c.subtopicTitle}. Do NOT jump into a lecture immediately.
+2. BE REACTIVE: Only provide detailed explanations or analogies if the student asks a question or expresses confusion. 
+3. USE THE LENS: When explaining, use analogies from ${c.activeInterest} naturally.
+4. BE CONCISE: Keep responses short and punchy. Avoid long blocks of text unless a deep dive is requested.
+5. NO JSON: Use clean, structured Markdown (bolding, lists) but avoid excessive headers.
+6. STAY ON TRACK: If they drift too far from the topic, use a ${c.activeInterest} hook to bring them back to ${c.subtopicTitle}.
+
+RESPONSE:`;
 }
 export function generateLearningPathPrompt(e: string, s: string, p: string, c: string[], i: string[]): string {
   return `Suggest 5 courses. JSON only.`;

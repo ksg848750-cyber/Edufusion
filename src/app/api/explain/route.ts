@@ -24,7 +24,7 @@ return NextResponse.json(
 
     // 3. Check Cache First (v17: Storyboard Force Update)
     const prompt = generateExplanationPrompt(topic, interest, mode, language, specificContext);
-    const hash = await hashPrompt(prompt + "|v19");
+    const hash = await hashPrompt(prompt + "|v21");
     
     const cachedExplanation = await getCached(hash);
     if (cachedExplanation) {
@@ -45,6 +45,11 @@ return NextResponse.json(
         SYSTEM_PERSONA
     );
 
+    console.log('--- INSTANT EXPLANATION GENERATED ---');
+    console.log('Topic:', topic);
+    console.log('Scene:', explanation.scene_source);
+    console.log('Deep Dive Steps:', Array.isArray(explanation.deep_dive) ? explanation.deep_dive.length : 0);
+
     // 5. Save to Cache
     await setCached(hash, {
         subtopicTitle: topic,
@@ -52,7 +57,7 @@ return NextResponse.json(
         mode,
         language,
         specificity: finalSpecificity,
-        scene: explanation.scene || "",
+        scene: explanation.scene || [],
         sceneSource: explanation.scene_source || "",
         result: explanation,
     });

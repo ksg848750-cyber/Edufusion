@@ -186,7 +186,7 @@ export default function LearnPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          sceneDescription: explanation.suggested_scene_image_prompt || explanation.scene,
+          sceneDescription: explanation.suggested_scene_image_prompt || (Array.isArray(explanation.scene) ? explanation.scene.join(" ") : explanation.scene),
           concept: currentSubtopic?.title || '',
           interest: activeInterest,
           sceneSource: explanation.scene_source,
@@ -273,6 +273,10 @@ export default function LearnPage() {
       });
 
       const data = await res.json();
+      if (data.success) {
+        await (window as any).refreshAuthProfile?.() || refreshProfile(); 
+      }
+
       if (data.leveledUp) {
         setLevelUpData({
           level: data.newLevel || (userProfile?.level || 1) + 1,
@@ -306,7 +310,7 @@ export default function LearnPage() {
 
   // Build readable text for voice
   const voiceText = explanation
-    ? `${explanation.hook}. ${explanation.scene}. ${explanation.twist}. ${explanation.deep_dive}`
+    ? `${explanation.hook}. ${Array.isArray(explanation.scene) ? explanation.scene.join(". ") : explanation.scene}. ${explanation.twist}. ${Array.isArray(explanation.deep_dive) ? explanation.deep_dive.join(". ") : explanation.deep_dive}`
     : '';
 
   if (!user || !userProfile) {
@@ -541,9 +545,25 @@ export default function LearnPage() {
               NEXT STEP →
             </NbButton>
           ) : (
-            <NbButton variant="default" onClick={handleNextSubtopic} style={{ borderRadius: '0', padding: '1rem 3rem', fontSize: '18px', background: 'var(--theme-accent-secondary)', color: 'var(--theme-bg)' }}>
-              FINISH ✓
-            </NbButton>
+            <div className="flex gap-3">
+              <NbButton 
+                variant="dark" 
+                onClick={handleNextSubtopic}
+                style={{ borderRadius: '0', fontSize: '12px', padding: '0.5rem 1rem' }}
+              >
+                FINISH ✓
+              </NbButton>
+              <NbButton 
+                variant="volt" 
+                onClick={async () => {
+                  await handleNextSubtopic();
+                  router.push(`/quiz/topic/${topicId}`);
+                }}
+                style={{ borderRadius: '0', padding: '1rem 2rem', fontSize: '16px' }}
+              >
+                TOPIC QUIZ 🏆
+              </NbButton>
+            </div>
           )}
         </div>
       </div>

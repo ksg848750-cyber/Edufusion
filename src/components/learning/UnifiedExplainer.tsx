@@ -99,9 +99,9 @@ export default function UnifiedExplainer({
                 <div className="absolute -inset-1 blur opacity-25 group-hover:opacity-50 transition duration-1000" style={{ background: 'var(--theme-accent)' }}></div>
                 <div className="relative p-7 border-4 border-black bg-black/60" style={{ boxShadow: '4px 4px 0 var(--theme-accent)' }}>
                   <div className="space-y-4">
-                    {explanation.scene?.split(/\n|\r\n/).filter(line => line.trim().length > 5).map((para, i) => {
-                      const cleanPara = para.replace(/^\d+\.\s*/, '').trim();
-                      if (!cleanPara) return null;
+                    {(Array.isArray(explanation.scene) ? explanation.scene : []).map((step, i) => {
+                      const cleanStep = typeof step === 'string' ? step.replace(/^\d+\.\s*/, '').trim() : '';
+                      if (!cleanStep) return null;
                       
                       return (
                         <div key={i} className="flex gap-4 group">
@@ -109,7 +109,7 @@ export default function UnifiedExplainer({
                             {String(i + 1).padStart(2, '0')}
                           </div>
                           <p className="nb-mono text-white/90 leading-relaxed flex-1" style={{ fontSize: '15px' }}>
-                            {cleanPara}
+                            {cleanStep}
                           </p>
                         </div>
                       );
@@ -190,9 +190,9 @@ export default function UnifiedExplainer({
                 THE MASTERCLASS (STEP-BY-STEP)
               </span>
               <div className="mt-6 space-y-4">
-                {explanation.deep_dive?.split(/\n|\r\n/).filter(line => line.trim().length > 5).map((para, i) => {
-                  const cleanPara = para.replace(/^\d+\.\s*/, '').trim();
-                  if (!cleanPara) return null;
+                {(Array.isArray(explanation.deep_dive) ? explanation.deep_dive : []).map((step, i) => {
+                  const cleanStep = typeof step === 'string' ? step.replace(/^\d+\.\s*/, '').trim() : '';
+                  if (!cleanStep) return null;
                   
                   return (
                     <div 
@@ -205,7 +205,7 @@ export default function UnifiedExplainer({
                           {String(i + 1).padStart(2, '0')}
                         </div>
                         <p className="nb-mono flex-1" style={{ fontSize: '14px', color: 'var(--theme-text)', lineHeight: 1.6 }}>
-                          {cleanPara}
+                          {cleanStep}
                         </p>
                       </div>
                     </div>
@@ -341,6 +341,27 @@ export default function UnifiedExplainer({
                  </li>
                ))}
              </ul>
+          </NbCard>
+        )}
+
+        {/* Quiz Prompt */}
+        {isCourseMode && (
+          <NbCard variant="plasma" className="p-6 border-4 shadow-pop" style={{ border: 'var(--theme-border)', background: 'var(--theme-accent-secondary)', boxShadow: 'var(--theme-shadow)' }}>
+            <span className="nb-mono text-black/50 text-[9px] font-bold block mb-4 uppercase">Assessment</span>
+            <p className="nb-mono text-black font-bold mb-4" style={{ fontSize: '12px' }}>
+              Ready to verify your mastery of this concept?
+            </p>
+            <NbButton 
+              variant="dark" 
+              className="w-full py-4 text-xs"
+              onClick={() => {
+                 // We'll need to handle navigation outside if we don't have router here
+                 // But better to pass a callback
+                 (window as any).location.href = `/quiz/subtopic/${(explanation as any).subtopicId || ''}`;
+              }}
+            >
+              TAKE SUBTOPIC QUIZ →
+            </NbButton>
           </NbCard>
         )}
 

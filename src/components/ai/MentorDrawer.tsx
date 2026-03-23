@@ -5,9 +5,10 @@ import NbButton from '@/components/ui/NbButton';
 import { useAuth } from '@/context/AuthContext';
 
 interface MentorDrawerProps {
-  courseId: string;
-  topicId: string;
-  subtopicId: string;
+  courseId?: string;
+  topicId?: string;
+  subtopicId?: string;
+  subtopicTitle?: string;
   activeInterest: string;
   isOpen: boolean;
   onClose: () => void;
@@ -22,6 +23,7 @@ export default function MentorDrawer({
   courseId,
   topicId,
   subtopicId,
+  subtopicTitle,
   activeInterest,
   isOpen,
   onClose,
@@ -59,6 +61,7 @@ export default function MentorDrawer({
           courseId,
           topicId,
           subtopicId,
+          subtopicTitle,
           activeInterest,
         }),
       });

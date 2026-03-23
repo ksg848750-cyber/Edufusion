@@ -153,9 +153,19 @@ export default function CoursePage() {
                     MASTERY: <span className="text-volt">{progressPct}%</span>
                   </span>
                 </div>
-                <div className="nb-stat-cell nb-stat-volt p-4 border-l-4 border-black">
-                  <div className="nb-stat-number" style={{ fontSize: '32px' }}>{units.length}</div>
-                  <div className="nb-stat-label">UNITS</div>
+                <div className="flex flex-col gap-2">
+                  <div className="nb-stat-cell nb-stat-volt p-4 border-l-4 border-black">
+                    <div className="nb-stat-number" style={{ fontSize: '32px' }}>{units.length}</div>
+                    <div className="nb-stat-label">UNITS</div>
+                  </div>
+                  <NbButton 
+                    variant="volt" 
+                    size="sm"
+                    onClick={() => router.push(`/quiz/course/${courseId}`)}
+                    className="w-full"
+                  >
+                    COURSE EXAM 🎓
+                  </NbButton>
                 </div>
               </div>
             </div>
@@ -206,9 +216,22 @@ export default function CoursePage() {
                         </h2>
                       </div>
                     </div>
-                    <span className="nb-display" style={{ fontSize: '24px', color: isExpanded ? 'var(--volt)' : '#444' }}>
-                      {isExpanded ? '⬘' : '⬙'}
-                    </span>
+                    <div className="flex items-center gap-4">
+                      <NbButton 
+                        variant="plasma" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/quiz/unit/${unit.id}`);
+                        }}
+                        className="nb-mono text-[9px] font-bold"
+                      >
+                        UNIT QUIZ ⚡
+                      </NbButton>
+                      <span className="nb-display" style={{ fontSize: '24px', color: isExpanded ? 'var(--volt)' : '#444' }}>
+                        {isExpanded ? '⬘' : '⬙'}
+                      </span>
+                    </div>
                   </div>
 
                   {isExpanded && (

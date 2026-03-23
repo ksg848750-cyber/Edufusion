@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 
-export type QuizType = 'topic' | 'unit' | 'course';
+export type QuizType = 'subtopic' | 'topic' | 'unit' | 'course';
 
 export interface QuizQuestion {
   question: string;

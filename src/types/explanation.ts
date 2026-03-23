@@ -6,9 +6,9 @@ export interface AnalogyMapping {
 export interface Explanation {
   scene_source: string;
   hook: string;
-  scene: string;
+  scene: string[];
   twist: string;
-  deep_dive: string;
+  deep_dive: string[];
   technical: string;
   key_points: string[];
   analogy_works: string;
@@ -27,7 +27,7 @@ export interface ExplanationCache {
   mode: string;
   language: string;
   specificity: string;
-  scene: string;
+  scene: string[];
   sceneSource: string;
   result: Explanation;
   createdAt: Date;
@@ -36,9 +36,9 @@ export interface ExplanationCache {
 export interface ExplanationResponse {
   scene_source: string;
   hook: string;
-  scene: string;
+  scene: string[];
   twist: string;
-  deep_dive: string;
+  deep_dive: string[];
   technical: string;
   key_points: string[];
   analogy_works: string;

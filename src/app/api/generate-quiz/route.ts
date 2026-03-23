@@ -37,7 +37,12 @@ export async function POST(req: NextRequest) {
     // Gather topic/subtopic titles based on quiz scope
     const topicTitles: string[] = [];
 
-    if (type === 'topic') {
+    if (type === 'subtopic') {
+      const subtopicDoc = await adminDb.collection('subtopics').doc(referenceId).get();
+      if (subtopicDoc.exists) {
+        topicTitles.push(subtopicDoc.data()?.title || '');
+      }
+    } else if (type === 'topic') {
       const topicDoc = await adminDb.collection('topics').doc(referenceId).get();
       if (topicDoc.exists) {
         topicTitles.push(topicDoc.data()?.title || '');

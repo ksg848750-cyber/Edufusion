@@ -23,29 +23,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { message, courseId, topicId, subtopicId, activeInterest } = result.data;
+    const { message, courseId, topicId, subtopicId, subtopicTitle: passedTitle, activeInterest } = result.data;
 
     // Get user profile
     const userDoc = await adminDb.collection('users').doc(user.uid).get();
     const userData = userDoc.exists ? (userDoc.data() as UserProfile) : null;
 
-    // Get topic and subtopic titles
-    const topicDoc = await adminDb.collection('topics').doc(topicId).get();
-    const subtopicDoc = await adminDb.collection('subtopics').doc(subtopicId).get();
-    const courseDoc = await adminDb.collection('courses').doc(courseId).get();
+    // Get topic and subtopic titles (optional for Quick Explain)
+    let topicTitle = 'Topic';
+    let subtopicTitle = passedTitle || 'Subtopic';
+    let courseTitle = 'Course';
 
-    const topicTitle = topicDoc.exists ? topicDoc.data()?.title || 'Topic' : 'Topic';
-    const subtopicTitle = subtopicDoc.exists ? subtopicDoc.data()?.title || 'Subtopic' : 'Subtopic';
-    const courseTitle = courseDoc.exists ? courseDoc.data()?.title || 'Course' : 'Course';
+    if (courseId && topicId && subtopicId) {
+      const [topicDoc, subtopicDoc, courseDoc] = await Promise.all([
+        adminDb.collection('topics').doc(topicId).get(),
+        adminDb.collection('subtopics').doc(subtopicId).get(),
+        adminDb.collection('courses').doc(courseId).get(),
+      ]);
+      topicTitle = topicDoc.data()?.title || topicTitle;
+      subtopicTitle = subtopicDoc.data()?.title || subtopicTitle;
+      courseTitle = courseDoc.data()?.title || courseTitle;
+    }
 
     // Fetch or create mentor chat
     const chatRef = adminDb.collection('mentorChats');
-    const chatQuery = await chatRef
-      .where('userId', '==', user.uid)
-      .where('courseId', '==', courseId)
-      .where('topicId', '==', topicId)
-      .limit(1)
-      .get();
+    let chatQuery;
+    
+    if (courseId && topicId) {
+      chatQuery = await chatRef
+        .where('userId', '==', user.uid)
+        .where('courseId', '==', courseId)
+        .where('topicId', '==', topicId)
+        .limit(1)
+        .get();
+    } else {
+      // Quick Explain Mode
+      chatQuery = await chatRef
+        .where('userId', '==', user.uid)
+        .where('type', '==', 'quick')
+        .where('concept', '==', subtopicTitle)
+        .limit(1)
+        .get();
+    }
 
     let chatDocRef: FirebaseFirestore.DocumentReference;
     let chatData: Record<string, unknown>;
@@ -55,9 +74,11 @@ export async function POST(req: NextRequest) {
       chatData = {
         chatId: chatDocRef.id,
         userId: user.uid,
-        courseId,
-        topicId,
-        subtopicId,
+        type: courseId ? 'course' : 'quick',
+        concept: subtopicTitle,
+        courseId: courseId || null,
+        topicId: topicId || null,
+        subtopicId: subtopicId || null,
         messages: [],
         chatSummary: '',
         activeInterest,
@@ -83,7 +104,6 @@ export async function POST(req: NextRequest) {
       language: userData?.language || 'english',
       last8Messages: last8.map((m) => ({ role: m.role, content: m.content })),
       chatSummary: (chatData.chatSummary as string) || '',
-      userProgress: `Level ${userData?.level || 1}, ${userData?.xp || 0} XP`,
     });
 
     const response = await callGroq(prompt, MODEL_SMART);

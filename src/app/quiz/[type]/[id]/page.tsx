@@ -20,9 +20,9 @@ interface QuizQuestion {
 export default function QuizPage() {
   const params = useParams();
   const router = useRouter();
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, refreshProfile } = useAuth();
 
-  const type = params.type as 'topic' | 'unit' | 'course';
+  const type = params.type as 'subtopic' | 'topic' | 'unit' | 'course';
   const referenceId = params.id as string;
 
   const [phase, setPhase] = useState<'interest' | 'loading' | 'quiz' | 'results'>('interest');
@@ -121,6 +121,7 @@ export default function QuizPage() {
       });
 
       const data = await res.json();
+      await (window as any).refreshAuthProfile?.() || refreshProfile(); 
       if (data.leveledUp) {
         setLevelUpData({
           level: data.newLevel,
@@ -216,7 +217,6 @@ export default function QuizPage() {
                 DASHBOARD
               </NbButton>
               <NbButton variant="volt" onClick={() => {
-                const parts = referenceId.split('_'); // not totally robust, better redirect to course
                 router.back();
               }}>
                 CONTINUE LEARNING →

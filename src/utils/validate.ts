@@ -29,7 +29,7 @@ export const generateSubtopicExplanationSchema = z.object({
 });
 
 export const generateQuizSchema = z.object({
-  type: z.enum(['topic', 'unit', 'course']),
+  type: z.enum(['subtopic', 'topic', 'unit', 'course']),
   referenceId: z.string().min(1),
   interest: z.string().min(1).max(100),
   mode: modeEnum.default('casual'),
@@ -37,9 +37,10 @@ export const generateQuizSchema = z.object({
 
 export const mentorChatSchema = z.object({
   message: z.string().min(1).max(2000),
-  courseId: z.string().min(1),
-  topicId: z.string().min(1),
-  subtopicId: z.string().min(1),
+  courseId: z.string().optional(),
+  topicId: z.string().optional(),
+  subtopicId: z.string().optional(),
+  subtopicTitle: z.string().optional(), // Fallback for Quick Explain
   activeInterest: z.string().min(1).max(100),
 });
 

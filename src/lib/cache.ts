@@ -43,7 +43,7 @@ export async function setCached(
     mode: string;
     language: string;
     specificity: string;
-    scene: string;
+    scene: string | string[];
     sceneSource: string;
     result: Record<string, unknown>;
   }
