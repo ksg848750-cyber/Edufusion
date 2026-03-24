@@ -105,6 +105,15 @@ export default function QuizPage() {
   const finishQuiz = async () => {
     if (!user) return;
     const isPerfect = score === questions.length;
+    const isFailed = score < 3;
+    let action = isPerfect ? 'PERFECT_QUIZ' : 'QUIZ_COMPLETE';
+    
+    if (isFailed) {
+      if (type === 'subtopic') action = 'FAIL_SUBTOPIC_QUIZ';
+      else if (type === 'topic') action = 'FAIL_TOPIC_QUIZ';
+      else if (type === 'unit') action = 'FAIL_UNIT_QUIZ';
+      else if (type === 'course') action = 'FAIL_COURSE_QUIZ';
+    }
     
     try {
       const token = await user.getIdToken();
@@ -115,7 +124,7 @@ export default function QuizPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          action: isPerfect ? 'PERFECT_QUIZ' : 'QUIZ_COMPLETE',
+          action,
           metadata: { type, referenceId, score, total: questions.length },
         }),
       });
@@ -135,7 +144,7 @@ export default function QuizPage() {
 
   if (!user || (!userProfile && phase === 'interest')) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--ink)' }}>
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--app-bg)' }}>
         <div className="nb-mono" style={{ color: '#666' }}>Loading...</div>
       </div>
     );
@@ -163,22 +172,26 @@ export default function QuizPage() {
 
   if (phase === 'loading') {
     return (
-      <div style={{ background: 'var(--ink)', minHeight: '100vh' }}>
+      <div className="relative nb-bg-grid overflow-hidden" style={{ background: 'var(--app-bg)', minHeight: '100vh' }}>
+        <div className="absolute inset-0 bg-[#00FF9D]/5 pointer-events-none" />
         <Navbar />
-        <div className="flex flex-col items-center justify-center py-32">
-          <div className="nb-cube-scene mb-8">
+        <div className="flex flex-col items-center justify-center py-32 relative z-10">
+          <div className="absolute inset-0 bg-ion blur-[100px] opacity-20 rounded-full max-w-sm mx-auto" />
+          <div className="nb-cube-scene scale-150 mb-16 relative z-10">
             <div className="nb-cube">
               <div className="nb-cube-face nb-cube-front">Q</div>
               <div className="nb-cube-face nb-cube-back">U</div>
               <div className="nb-cube-face nb-cube-top">I</div>
               <div className="nb-cube-face nb-cube-bottom">Z</div>
+              <div className="nb-cube-face nb-cube-left">?</div>
+              <div className="nb-cube-face nb-cube-right">!</div>
             </div>
           </div>
-          <p className="nb-display" style={{ fontSize: '24px', color: 'var(--volt)' }}>
-            CRAFTING YOUR QUIZ...
+          <p className="nb-display tracking-widest" style={{ fontSize: '32px', color: 'var(--volt)', textShadow: '2px 2px 0 var(--plasma)' }}>
+            CRAFTING YOUR SIMULATION...
           </p>
-          <p className="nb-mono mt-2" style={{ fontSize: '11px', color: '#888' }}>
-            Integrating {selectedInterest} themes...
+          <p className="nb-mono font-bold mt-4 tracking-widest bg-black/50 px-4 py-2 border-[2px] border-volt/20" style={{ fontSize: '11px', color: '#888' }}>
+            INTEGRATING {selectedInterest?.toUpperCase()} SEQUENCES // STANDBY
           </p>
         </div>
       </div>
@@ -187,8 +200,12 @@ export default function QuizPage() {
 
   if (phase === 'results') {
     const isPerfect = score === questions.length;
+    const isFailed = score < 3;
+    const message = isPerfect ? 'PERFECT SCORE!' : (isFailed ? 'QUIZ FAILED' : 'QUIZ COMPLETE');
+    const color = isFailed ? '#ff4444' : (isPerfect ? 'var(--volt)' : 'var(--plasma)');
+
     return (
-      <div style={{ background: 'var(--ink)', minHeight: '100vh' }}>
+      <div style={{ background: 'var(--app-bg)', minHeight: '100vh' }}>
         <Navbar />
         <div className="flex flex-col items-center justify-center py-20 px-4">
           <motion.div
@@ -197,11 +214,11 @@ export default function QuizPage() {
             className="nb-card text-center max-w-lg w-full p-10"
             style={{
               background: 'var(--ink)',
-              border: `4px solid ${isPerfect ? 'var(--volt)' : 'var(--plasma)'}`,
+              border: `4px solid ${color}`,
             }}
           >
-            <div className="nb-display nb-glitch mb-4" style={{ fontSize: '48px', color: isPerfect ? 'var(--volt)' : 'var(--plasma)' }}>
-              {isPerfect ? 'PERFECT SCORE!' : 'QUIZ COMPLETE'}
+            <div className="nb-display nb-glitch mb-4" style={{ fontSize: '48px', color }}>
+              {message}
             </div>
             
             <div className="nb-display my-6" style={{ fontSize: '64px', color: 'var(--chalk)' }}>
@@ -209,7 +226,7 @@ export default function QuizPage() {
             </div>
 
             <p className="nb-mono mb-8" style={{ fontSize: '12px', color: '#888' }}>
-              XP has been awarded to your profile.
+              {isFailed ? "You didn't pass this time. XP has been deducted." : "XP has been awarded to your profile."}
             </p>
 
             <div className="flex gap-4 justify-center">
@@ -241,17 +258,17 @@ export default function QuizPage() {
   const q = questions[currentQ];
 
   return (
-    <div style={{ background: 'var(--ink)', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'var(--app-bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
       {/* Progress */}
-      <div className="px-6 py-4 flex items-center gap-4" style={{ borderBottom: '2px solid #222' }}>
-        <span className="nb-mono" style={{ fontSize: '10px', color: '#888' }}>
-          QUESTION {currentQ + 1} OF {questions.length}
+      <div className="px-8 py-6 flex items-center gap-6 bg-black/40" style={{ borderBottom: '4px solid var(--plasma)' }}>
+        <span className="nb-mono font-bold tracking-widest text-plasma" style={{ fontSize: '12px' }}>
+          QUESTION {String(currentQ + 1).padStart(2, '0')} / {String(questions.length).padStart(2, '0')}
         </span>
-        <div className="flex-1 nb-progress-track">
+        <div className="flex-1 nb-progress-track border-[2px] border-white/20 p-1" style={{ height: '24px', background: 'transparent' }}>
           <div
-            className="nb-progress-fill nb-progress-fill-volt"
+            className="h-full bg-plasma shadow-[0_0_10px_var(--plasma)] transition-all"
             style={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
           />
         </div>
@@ -270,24 +287,29 @@ export default function QuizPage() {
               {q.question}
             </h2>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {q.options.map((opt, i) => {
                 const isSelected = selectedOption === opt;
-                let bg = 'var(--ink)';
-                let border = 'var(--bd)';
+                let bg = 'rgba(0,0,0,0.6)';
+                let border = '4px solid rgba(255,255,255,0.1)';
                 let color = 'var(--chalk)';
+                let shadow = 'none';
 
                 if (selectedOption !== null) {
                   if (opt === q.correctAnswer) {
-                    bg = 'rgba(212, 255, 0, 0.1)';
-                    border = '2px solid var(--volt)';
+                    bg = 'rgba(219, 255, 0, 0.1)';
+                    border = '4px solid var(--volt)';
                     color = 'var(--volt)';
+                    shadow = '0 0 15px rgba(219, 255, 0, 0.4)';
                   } else if (isSelected) {
-                    bg = 'rgba(255, 68, 68, 0.1)';
-                    border = '2px solid #ff4444';
-                    color = '#ff4444';
+                    bg = 'rgba(255, 0, 122, 0.1)';
+                    border = '4px solid var(--plasma)';
+                    color = 'var(--plasma)';
+                    shadow = '0 0 15px rgba(255, 0, 122, 0.4)';
                   } else {
-                    color = '#666';
+                     if (opt !== q.correctAnswer && !isSelected) {
+                       color = '#666';
+                     }
                   }
                 } else if (isSelected) {
                   bg = 'var(--volt)';
@@ -298,14 +320,14 @@ export default function QuizPage() {
                   <div
                     key={i}
                     onClick={() => handleAnswer(opt)}
-                    className="nb-card cursor-pointer transition-all"
-                    style={{ background: bg, border, color, padding: '16px' }}
+                    className="cursor-pointer transition-all hover:-translate-y-1 hover:border-white"
+                    style={{ background: bg, border, color, padding: '24px', boxShadow: shadow }}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="nb-mono mt-1" style={{ fontSize: '10px', opacity: 0.7 }}>
-                        {String.fromCharCode(65 + i)}.
+                    <div className="flex items-start gap-4">
+                      <div className="nb-display mt-1 tracking-widest" style={{ fontSize: '24px', opacity: 0.5 }}>
+                        {String.fromCharCode(65 + i)}
                       </div>
-                      <div style={{ fontSize: '16px', lineHeight: 1.5 }}>
+                      <div className="nb-mono leading-relaxed font-bold" style={{ fontSize: '15px' }}>
                         {opt}
                       </div>
                     </div>
@@ -318,22 +340,26 @@ export default function QuizPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-6 nb-card"
+                className="mt-8 p-6"
                 style={{
                   background: 'var(--ink)',
-                  borderTop: `4px solid ${isCorrect ? 'var(--volt)' : '#ff4444'}`,
+                  border: `4px solid ${isCorrect ? 'var(--volt)' : 'var(--plasma)'}`,
+                  boxShadow: `0 0 20px ${isCorrect ? 'rgba(219, 255, 0, 0.3)' : 'rgba(255, 0, 122, 0.3)'}`,
                 }}
               >
-                <div className="nb-display mb-2" style={{ fontSize: '18px', color: isCorrect ? 'var(--volt)' : '#ff4444' }}>
-                  {isCorrect ? 'CORRECT!' : 'INCORRECT'}
+                <div className="nb-display mb-4 tracking-widest" style={{ fontSize: '32px', color: isCorrect ? 'var(--volt)' : 'var(--plasma)' }}>
+                  {isCorrect ? 'CORRECT // SYSTEM OVERRIDE SUCCESS' : 'INCORRECT // CRITICAL FAILURE'}
                 </div>
-                <p style={{ fontSize: '14px', color: 'var(--chalk)', lineHeight: 1.6 }}>
+                <p className="nb-mono font-bold text-white/80" style={{ fontSize: '14px', lineHeight: 1.8 }}>
                   {q.explanation}
                 </p>
-                <div className="mt-4 flex justify-end">
-                  <NbButton variant="volt" onClick={nextQuestion}>
-                    {currentQ < questions.length - 1 ? 'NEXT QUESTION →' : 'FINISH QUIZ →'}
-                  </NbButton>
+                <div className="mt-8 flex justify-end">
+                  <button 
+                    onClick={nextQuestion}
+                    className="bg-white hover:bg-[#ccc] text-black nb-display text-2xl px-8 py-4 transition-colors tracking-widest shadow-[4px_4px_0_var(--volt)]"
+                  >
+                    {currentQ < questions.length - 1 ? 'NEXT SEQUENCE →' : 'TERMINATE SEQUENCE →'}
+                  </button>
                 </div>
               </motion.div>
             )}

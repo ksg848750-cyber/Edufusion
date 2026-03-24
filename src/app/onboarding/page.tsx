@@ -67,7 +67,7 @@ export default function OnboardingPage() {
   const classes = ['10th', '12th', 'btech-1', 'btech-2', 'btech-3', 'btech-4', 'mtech', 'mba'];
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--ink)' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--app-bg)' }}>
       <div className="nb-scanline-overlay" />
 
       <motion.div

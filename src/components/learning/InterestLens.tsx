@@ -67,14 +67,6 @@ export default function InterestLens({
         <p className="nb-mono text-center mb-4" style={{ fontSize: '11px', color: '#666' }}>
           Pick one. We&apos;ll explain everything through that world.
         </p>
-        <NbButton
-          variant="volt"
-          size="lg"
-          disabled={!selectedInterest}
-          onClick={() => selectedInterest && onSelect(selectedInterest)}
-        >
-          START LEARNING →
-        </NbButton>
       </div>
     </div>
   );

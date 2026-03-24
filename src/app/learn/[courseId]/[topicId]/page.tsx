@@ -274,7 +274,7 @@ export default function LearnPage() {
 
       const data = await res.json();
       if (data.success) {
-        await (window as any).refreshAuthProfile?.() || refreshProfile(); 
+        await (window as any).refreshAuthProfile?.(); 
       }
 
       if (data.leveledUp) {
@@ -315,7 +315,7 @@ export default function LearnPage() {
 
   if (!user || !userProfile) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--ink)' }}>
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--app-bg)' }}>
         <div className="nb-mono" style={{ color: '#666' }}>Loading...</div>
       </div>
     );
@@ -324,7 +324,7 @@ export default function LearnPage() {
   // INTEREST LENS SCREEN
   if (phase === 'interest' || showInterestPicker) {
     return (
-      <div style={{ background: 'var(--ink)', minHeight: '100vh' }}>
+      <div style={{ background: 'var(--app-bg)', minHeight: '100vh' }}>
         <Navbar />
         <InterestLens
           userInterests={userProfile.interests || []}
@@ -368,12 +368,14 @@ export default function LearnPage() {
       <ThemeFlare interest={activeInterest} />
 
       <div className="nb-bg-grid fixed inset-0 z-0" style={{ backgroundColor: 'var(--theme-bg)' }} />
-      <div className="relative z-10 px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="nb-mono flex items-center gap-2" style={{ fontSize: '11px', color: 'var(--theme-accent)', fontWeight: 'bold' }}>
-            {courseTitle.toUpperCase()} <span className="text-white/20">/</span> {topicTitle.toUpperCase()}
-          </div>
-          <h2 className="nb-display mt-1 nb-glitch" style={{ fontSize: '42px', color: 'var(--theme-text)', letterSpacing: '0.05em' }}>{currentSubtopic?.title}</h2>
+      <div className="relative z-10 px-12 pt-16 pb-12 max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="max-w-[800px]">
+          <h1 className="nb-display leading-[0.85] tracking-tighter" style={{ fontSize: 'clamp(5rem, 10vw, 130px)', color: 'var(--theme-text)', textShadow: '6px 6px 0 var(--theme-accent)' }}>
+            {currentSubtopic?.title?.toUpperCase() || "CONCEPT"}
+          </h1>
+          <p className="nb-mono text-white mt-6 tracking-widest uppercase text-xl">
+             Immersive Concept Experience
+          </p>
         </div>
 
         {/* Active Interest Pill */}
@@ -382,23 +384,23 @@ export default function LearnPage() {
             setShowInterestPicker(true);
             setSelectedInterest(null);
           }}
-          className="nb-mono px-6 py-3 transition-all hover:scale-105 active:scale-95"
+          className="nb-mono px-8 py-4 transition-all hover:scale-105 active:scale-95"
           style={{
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 'bold',
-            border: 'var(--bd)',
-            boxShadow: 'var(--sh-sm)',
-            background: 'var(--theme-accent)',
-            color: 'var(--theme-bg)',
+            border: '4px solid var(--theme-accent)',
+            boxShadow: 'var(--theme-shadow)',
+            background: 'var(--ink)',
+            color: 'var(--theme-accent)',
             borderRadius: '0',
             cursor: 'pointer',
           }}
         >
-          EXPLORING THROUGH: <span className="ml-2">{INTEREST_EMOJIS[activeInterest]} {INTEREST_LABELS[activeInterest]?.toUpperCase()} ▼</span>
+          EXPLORING VIA: <span className="ml-2 text-white">{INTEREST_EMOJIS[activeInterest]} {INTEREST_LABELS[activeInterest]?.toUpperCase()} ▼</span>
         </button>
       </div>
 
-      <div className="relative z-10 px-8 pb-32 max-w-[1400px] mx-auto">
+      <div className="relative z-10 px-8 pb-32 max-w-[1600px] mx-auto">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content: High Contrast Card */}
           <div className="flex-1">
@@ -420,6 +422,8 @@ export default function LearnPage() {
                         <div className="nb-cube-face nb-cube-back">D</div>
                         <div className="nb-cube-face nb-cube-top">U</div>
                         <div className="nb-cube-face nb-cube-bottom">F</div>
+                        <div className="nb-cube-face nb-cube-left">U</div>
+                        <div className="nb-cube-face nb-cube-right">!</div>
                       </div>
                     </div>
                     <p className="nb-mono" style={{ fontSize: '14px', color: '#888' }}>

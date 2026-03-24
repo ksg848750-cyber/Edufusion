@@ -5,6 +5,10 @@ export type XPAction =
   | 'COMPLETE_COURSE'
   | 'PERFECT_QUIZ'
   | 'QUIZ_COMPLETE'
+  | 'FAIL_SUBTOPIC_QUIZ'
+  | 'FAIL_TOPIC_QUIZ'
+  | 'FAIL_UNIT_QUIZ'
+  | 'FAIL_COURSE_QUIZ'
   | 'DAILY_LOGIN';
 
 export type Tier = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';

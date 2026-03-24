@@ -32,23 +32,24 @@ export default function CinematicIntro() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
           className="fixed inset-0 z-[9999] flex items-center justify-center"
-          style={{ background: 'var(--ink)' }}
+          style={{ background: 'var(--app-bg)' }}
         >
           <div className="nb-scanline-overlay" />
 
           {/* 3D Cube */}
           <motion.div
             initial={{ scale: 0, rotateY: 0 }}
-            animate={{ scale: 1, rotateY: 360 }}
+            animate={{ scale: 1.54, rotateY: 360 }}
             transition={{ duration: 1.5, ease: 'easeOut' }}
             className="nb-cube-scene mb-8"
-            style={{ width: '80px', height: '80px' }}
           >
-            <div className="nb-cube" style={{ width: '80px', height: '80px' }}>
-              <div className="nb-cube-face nb-cube-front" style={{ width: '80px', height: '80px', fontSize: '36px' }}>E</div>
-              <div className="nb-cube-face nb-cube-back" style={{ width: '80px', height: '80px', fontSize: '36px' }}>D</div>
-              <div className="nb-cube-face nb-cube-top" style={{ width: '80px', height: '80px', fontSize: '36px' }}>U</div>
-              <div className="nb-cube-face nb-cube-bottom" style={{ width: '80px', height: '80px', fontSize: '36px' }}>F</div>
+            <div className="nb-cube">
+              <div className="nb-cube-face nb-cube-front">E</div>
+              <div className="nb-cube-face nb-cube-back">D</div>
+              <div className="nb-cube-face nb-cube-top">U</div>
+              <div className="nb-cube-face nb-cube-bottom">F</div>
+              <div className="nb-cube-face nb-cube-left">U</div>
+              <div className="nb-cube-face nb-cube-right">!</div>
             </div>
           </motion.div>
 

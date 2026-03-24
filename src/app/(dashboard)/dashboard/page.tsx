@@ -132,106 +132,90 @@ export default function DashboardPage() {
 
   if (!user || !userProfile) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--ink)' }}>
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--app-bg)' }}>
         <div className="nb-mono" style={{ color: '#666' }}>Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-hidden" style={{ background: 'var(--ink)', minHeight: '100vh' }}>
+    <div className="relative overflow-hidden" style={{ background: 'var(--app-bg)', minHeight: '100vh' }}>
       <Navbar />
       <TickerBar />
 
 
-      {/* Hero */}
-      <div className="nb-page-hero" style={{ paddingBottom: '3rem' }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
-            <div>
-              <h1 className="nb-display" style={{ color: 'var(--volt)', fontSize: 'clamp(3rem, 8vw, 5rem)', lineHeight: 0.9 }}>
-                UNDERSTAND ANYTHING <br />
-                THROUGH WHAT YOU LOVE
-              </h1>
-              <div className="nb-subtitle mt-4">
-                 WELCOME BACK, <span style={{ color: 'var(--volt)' }}>{userProfile.name?.toUpperCase() || 'LEARNER'}</span> — YOUR TERMINAL IS READY.
-              </div>
-            </div>
-
-            {/* Quick Actions at Top */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Instant Explain Box */}
-              <NbCard variant="solar" className="p-4" style={{ background: 'rgba(0,0,0,0.8)' }}>
-                <div className="nb-mono mb-2" style={{ fontSize: '10px', color: 'var(--solar)' }}>INSTANT EXPLAIN</div>
-                <input 
-                  type="text" 
-                  className="nb-input w-full mb-2" 
-                  placeholder="Ask anything..." 
-                  style={{ fontSize: '12px', padding: '0.5rem' }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      router.push(`/explain?concept=${encodeURIComponent(e.currentTarget.value)}`);
-                    }
-                  }}
-                />
-                <div className="nb-mono text-[9px] color-[#555]">ENTER TO SEARCH</div>
-              </NbCard>
-
-              {/* Quick Generate Box */}
-              <NbCard variant="volt" className="p-4" style={{ background: 'rgba(0,0,0,0.8)' }}>
-                <div className="nb-mono mb-2" style={{ fontSize: '10px', color: 'var(--volt)' }}>NEW COURSE</div>
-                <input 
-                  type="text" 
-                  className="nb-input w-full mb-2" 
-                  placeholder="Subject name..." 
-                  style={{ fontSize: '12px', padding: '0.5rem' }}
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && generateCourse()}
-                />
-                <div className="flex gap-2">
-                  <NbButton variant="volt" size="sm" className="flex-1" onClick={generateCourse} disabled={generating}>
-                    {generating ? '...' : 'GENERATE'}
-                  </NbButton>
-                  <label className="nb-btn nb-btn-dark py-1 cursor-pointer" style={{ fontSize: '10px' }}>
-                    📸
-                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                  </label>
-                </div>
-              </NbCard>
-            </div>
-          </div>
-        </div>
+      {/* Brand Header */}
+      <div className="pt-12 px-8 max-w-[1400px] mx-auto flex items-center justify-between">
+         <h1 className="nb-display text-white tracking-tight" style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', textShadow: '4px 4px 0 var(--plasma)' }}>
+           EDUFUSION
+         </h1>
       </div>
 
-      {/* Stat Row: Vibrant & Rounded */}
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <NbCard variant="volt" className="flex flex-col items-center p-6 text-center">
-            <div className="nb-stat-label">LEVEL</div>
-            <div className="nb-stat-number">{userProfile.level || 1}</div>
-            <div className="nb-progress-track mt-2 w-full">
-              <div className="nb-progress-fill nb-progress-fill-volt" style={{ width: `${Math.min(xpProgress, 100)}%` }} />
-            </div>
-            <div className="nb-mono mt-1" style={{ fontSize: '10px' }}>{userProfile.xp || 0}/{xpForNext} XP</div>
-          </NbCard>
+      {/* 3-Column Dashboard Hero (Matching Mockup exactly) */}
+      <div className="p-8 pb-16 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+        
+        {/* Column 1: STATS */}
+        <div className="p-8 relative min-h-[400px] flex flex-col" style={{ background: 'var(--ink)' }}>
+           <div className="absolute inset-0 border-[4px] border-[#00FF9D] pointer-events-none z-10" />
+           <div className="absolute inset-2 border-[2px] border-white pointer-events-none z-10" />
+           <h2 className="nb-display text-white text-4xl mb-8 tracking-wide relative z-20">YOUR STATS</h2>
+           
+           <div className="border-[2px] border-white/20 p-6 mb-6 relative z-20 bg-black/40">
+              <div className="flex justify-between items-end mb-3">
+                 <span className="nb-display text-white text-3xl">LEVEL {userProfile.level || 1}</span>
+                 <span className="nb-display text-white text-2xl">{Math.round(xpProgress)}%</span>
+              </div>
+              <div className="h-4 bg-black border-[2px] border-white p-[2px]">
+                 <div className="h-full bg-white transition-all shadow-[0_0_10px_white]" style={{ width: `${Math.min(xpProgress, 100)}%` }} />
+              </div>
+           </div>
 
-          <NbCard variant="plasma" className="flex flex-col items-center p-6 text-center">
-            <div className="nb-stat-label">STREAK</div>
-            <div className="nb-stat-number">{userProfile.streakDays || 0}</div>
-            <div className="nb-mono mt-1" style={{ fontSize: '10px' }}>DAYS 🔥</div>
-          </NbCard>
-
-          <NbCard variant="ion" className="flex flex-col items-center p-6 text-center">
-            <div className="nb-stat-label">TIER</div>
-            <div className="nb-stat-number" style={{ fontSize: '28px' }}>{userProfile.tier || 'Bronze'}</div>
-          </NbCard>
-
-          <NbCard variant="solar" className="flex flex-col items-center p-6 text-center">
-            <div className="nb-stat-label">COURSES</div>
-            <div className="nb-stat-number">{courses.length}</div>
-          </NbCard>
+           <div className="border-[2px] border-white/20 p-6 flex justify-between items-center relative z-20 bg-black/40">
+              <div>
+                <div className="nb-display text-white/70 text-xl">STREAK</div>
+                <div className="nb-display text-white text-4xl">{userProfile.streakDays || 0} DAYS</div>
+              </div>
+              <span className="text-5xl" style={{ filter: 'drop-shadow(0 0 10px white)' }}>⚡</span>
+           </div>
         </div>
+
+        {/* Column 2: CURRENT QUEST */}
+        <div className="p-8 relative min-h-[400px] flex flex-col items-center justify-between" style={{ background: 'var(--ink)' }}>
+           <div className="absolute inset-0 border-[4px] border-[#00FF9D] pointer-events-none z-10" />
+           <div className="absolute inset-2 border-[2px] border-white pointer-events-none z-10" />
+           <h2 className="nb-display text-white text-4xl tracking-wide w-full text-left relative z-20">CURRENT QUEST</h2>
+           
+           <div className="flex-1 flex items-center justify-center my-8 relative z-20 w-full">
+              <div className="absolute inset-0 bg-[#00F5FF] blur-[80px] opacity-40 rounded-full" />
+              <div className="text-[120px] relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 0 30px #00F5FF)' }}>💎</div>
+           </div>
+
+           <div className="nb-display text-white text-3xl uppercase text-left w-full leading-none relative z-20">
+             {courses[0]?.title || "CRYSTAL CODEX: UNLOCKING THE FUTURE OF AI"}
+           </div>
+        </div>
+
+        {/* Column 3: NEXT LESSON */}
+        <div className="p-8 relative min-h-[400px] flex flex-col justify-between" style={{ background: 'var(--ink)' }}>
+           <div className="absolute inset-0 border-[4px] border-[#00FF9D] pointer-events-none z-10" />
+           <div className="absolute inset-2 border-[2px] border-white pointer-events-none z-10" />
+           <h2 className="nb-display text-white text-4xl tracking-wide relative z-20">NEXT LESSON</h2>
+           
+           <div className="flex-1 flex flex-col justify-center relative z-20">
+             <button 
+               className="w-full bg-[#DBFF00] text-black nb-display text-5xl py-8 hover:-translate-y-2 hover:translate-x-2 transition-transform shadow-[-8px_8px_0_#00FF9D]"
+               onClick={() => router.push(courses[0] ? `/course/${courses[0].courseId}` : '/')}
+             >
+               START LESSON
+             </button>
+           </div>
+
+           <div className="nb-mono text-white/80 text-sm mt-8 border-t-[2px] border-white/20 pt-6 relative z-20 uppercase tracking-widest">
+              {(courses[0]?.title || "ADVANCED NEURAL NETWORKS")}.<br/>
+              Estimated time: 45 mins.
+           </div>
+        </div>
+
       </div>
 
       <div className="p-6 max-w-5xl mx-auto">
@@ -241,47 +225,46 @@ export default function DashboardPage() {
         </div>
 
         {courses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 relative z-10">
             {courses.map((course) => (
               <div
                 key={course.courseId}
-                className="nb-card cursor-pointer group"
+                className="cursor-pointer group relative p-8 transition-all hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(0,245,255,0.4)]"
                 style={{ 
-                  borderTop: 'var(--bd)',
-                  borderTopColor: 'var(--ion)', 
+                  border: '4px solid var(--ion)',
                   background: 'var(--ink)',
-                  padding: '2rem'
+                  boxShadow: '0 0 15px rgba(0, 245, 255, 0.15)'
                 }}
                 onClick={() => router.push(`/course/${course.courseId}`)}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="nb-display" style={{ fontSize: '28px', color: 'var(--chalk)', lineHeight: 1.1 }}>
-                    {course.title}
+                <div className="flex justify-between items-start mb-6">
+                  <h3 className="nb-display tracking-widest" style={{ fontSize: '32px', color: 'var(--chalk)', lineHeight: 1.1 }}>
+                    {course.title.toUpperCase()}
                   </h3>
-                  <span className="text-2xl group-hover:rotate-12 transition-transform">📚</span>
+                  <span className="text-4xl group-hover:rotate-12 group-hover:scale-110 transition-transform drop-shadow-[0_0_10px_white]">💎</span>
                 </div>
                 
-                <div className="nb-progress-track mt-6" style={{ height: '10px', borderRadius: '5px' }}>
+                <div className="nb-progress-track border-[2px] border-white/20 p-1" style={{ height: '16px', borderRadius: '0', background: 'transparent' }}>
                   <div
-                    className="nb-progress-fill nb-progress-fill-ion"
+                    className="h-full bg-ion shadow-[0_0_10px_var(--ion)] transition-all"
                     style={{ width: `${course.progressPercentage || 0}%` }}
                   />
                 </div>
-                <div className="flex justify-between items-center mt-3">
-                  <div className="nb-mono" style={{ fontSize: '11px', color: '#666' }}>
-                    {course.progressPercentage || 0}% MASTERED
+                <div className="flex justify-between items-center mt-6">
+                  <div className="nb-mono font-bold tracking-widest" style={{ fontSize: '11px', color: '#888' }}>
+                    <span className="text-ion">{course.progressPercentage || 0}%</span> MASTERED
                   </div>
-                  <NbButton variant="ion" size="sm">
+                  <button className="bg-ion hover:bg-[#00d0d9] text-black nb-mono font-bold px-4 py-2 text-[10px] uppercase tracking-widest shadow-[2px_2px_0_white] transition-colors">
                     CONTINUE →
-                  </NbButton>
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 mb-8">
-            <p className="nb-mono" style={{ fontSize: '12px', color: '#666' }}>
-              No courses yet. Generate your first course below!
+          <div className="text-center py-12 mb-16 border-[4px] border-white/10 bg-black/40">
+            <p className="nb-mono font-bold tracking-widest" style={{ fontSize: '14px', color: '#666' }}>
+              NO ACTIVE QUESTS. GENERATE YOUR FIRST MODULE BELOW.
             </p>
           </div>
         )}
@@ -291,12 +274,17 @@ export default function DashboardPage() {
           <span>DISCOVER NEW WORLDS</span>
         </div>
 
-        <NbCard variant="volt" className="mb-12 p-12 text-center" style={{ background: 'var(--ink)' }}>
+        <div className="mb-16 p-12 text-center relative overflow-hidden transition-all" style={{ border: '4px solid var(--volt)', background: 'var(--ink)', boxShadow: '0 0 20px rgba(219,255,0,0.15)' }}>
+          <div className="absolute inset-0 bg-volt/5 pointer-events-none" />
+          <div className="relative z-10">
           {!showGenerator ? (
             <div className="text-center">
-              <NbButton variant="volt" size="lg" onClick={() => setShowGenerator(true)}>
+              <button 
+                onClick={() => setShowGenerator(true)}
+                className="bg-volt text-black nb-display text-4xl px-12 py-6 hover:-translate-y-2 transition-transform shadow-[6px_6px_0_var(--plasma)]"
+              >
                 + START NEW COURSE
-              </NbButton>
+              </button>
             </div>
           ) : (
             <div>
@@ -366,10 +354,14 @@ export default function DashboardPage() {
                 <div className="mb-4 border-[3px] border-black border-dashed p-8 text-center bg-[var(--chalk)]">
                   {scanning ? (
                     <div className="flex flex-col items-center">
-                      <div className="nb-cube-scene mb-4" style={{ width: '40px', height: '40px' }}>
-                        <div className="nb-cube" style={{ width: '40px', height: '40px' }}>
+                      <div className="nb-cube-scene mb-4" style={{ transform: 'scale(0.77)' }}>
+                        <div className="nb-cube">
                           <div className="nb-cube-face nb-cube-front">S</div>
                           <div className="nb-cube-face nb-cube-back">C</div>
+                          <div className="nb-cube-face nb-cube-top">A</div>
+                          <div className="nb-cube-face nb-cube-bottom">N</div>
+                          <div className="nb-cube-face nb-cube-left">N</div>
+                          <div className="nb-cube-face nb-cube-right">!</div>
                         </div>
                       </div>
                       <p className="nb-mono font-bold">SCANNING SYLLABUS... {scanProgress}%</p>
@@ -435,10 +427,14 @@ export default function DashboardPage() {
 
               {(generating || scanning) && (
                 <div className="mt-4 flex items-center gap-3">
-                  <div className="nb-cube-scene" style={{ width: '30px', height: '30px' }}>
-                    <div className="nb-cube" style={{ width: '30px', height: '30px' }}>
-                      <div className="nb-cube-face nb-cube-front" style={{ fontSize: '10px' }}>E</div>
-                      <div className="nb-cube-face nb-cube-back" style={{ fontSize: '10px' }}>D</div>
+                  <div className="nb-cube-scene" style={{ transform: 'scale(0.58)' }}>
+                    <div className="nb-cube">
+                      <div className="nb-cube-face nb-cube-front">E</div>
+                      <div className="nb-cube-face nb-cube-back">D</div>
+                      <div className="nb-cube-face nb-cube-top">U</div>
+                      <div className="nb-cube-face nb-cube-bottom">F</div>
+                      <div className="nb-cube-face nb-cube-left">U</div>
+                      <div className="nb-cube-face nb-cube-right">!</div>
                     </div>
                   </div>
                   <span className="nb-mono" style={{ fontSize: '11px', color: '#888' }}>
@@ -448,7 +444,8 @@ export default function DashboardPage() {
               )}
             </div>
           )}
-        </NbCard>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -47,14 +47,14 @@ export default function SettingsPage() {
 
   if (!user || !userProfile) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--ink)' }}>
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--app-bg)' }}>
         <div className="nb-mono" style={{ color: '#666' }}>Loading...</div>
       </div>
     );
   }
 
   return (
-    <div style={{ background: 'var(--ink)', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--app-bg)', minHeight: '100vh' }}>
       <Navbar />
 
       <div className="p-6 max-w-3xl mx-auto">

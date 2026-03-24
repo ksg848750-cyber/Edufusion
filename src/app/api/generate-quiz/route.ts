@@ -77,11 +77,21 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = generateQuizPrompt(topicTitles, interest, mode);
-    const quizData = await callGroqJSON<QuizResponse>(prompt);
+    let quizData: any = await callGroqJSON<QuizResponse>(prompt);
 
-    if (!quizData.questions || quizData.questions.length === 0) {
+    // Groq sometimes returns the JSON object as a string property inside another object if the schema hints are confusing
+    if (typeof quizData === 'string') {
+      try {
+        quizData = JSON.parse(quizData);
+      } catch (e) {
+        console.error('Failed to parse stringified JSON from Groq:', quizData);
+      }
+    }
+
+    if (!quizData || !quizData.questions || !Array.isArray(quizData.questions) || quizData.questions.length === 0) {
+      console.error('Invalid quiz data structure from Groq:', JSON.stringify(quizData));
       return NextResponse.json(
-        { error: 'AI returned no questions' },
+        { error: 'AI returned invalid questions structure', received: quizData },
         { status: 500 }
       );
     }
@@ -89,7 +99,7 @@ export async function POST(req: NextRequest) {
     // Shuffle questions and options
     const shuffled = quizData.questions
       .sort(() => Math.random() - 0.5)
-      .map((q) => ({
+      .map((q: any) => ({
         ...q,
         options: q.options.sort(() => Math.random() - 0.5),
       }));

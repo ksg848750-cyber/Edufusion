@@ -67,23 +67,22 @@ export default function UnifiedExplainer({
       className="grid grid-cols-1 lg:grid-cols-3 gap-8"
     >
       {/* Main Column */}
-      <div className="lg:col-span-2 flex flex-col gap-8">
-        <NbCard variant="default" className="p-0 overflow-hidden" style={{ border: 'var(--theme-border)', background: 'var(--theme-bg)', boxShadow: 'var(--theme-shadow)' }}>
-          {/* Header Strip */}
-          <div className="border-b-4 border-black px-6 py-3 flex items-center justify-between" style={{ background: 'var(--theme-accent)' }}>
-            <span className="nb-mono text-black font-bold text-[11px] tracking-thinner">
-              {explanation.scene_source?.toUpperCase() || 'CINEMATIC MASTERCLASS'}
-            </span>
-            <span className="nb-mono text-black/60 text-[9px] font-bold">V16_ENGINE_ACTIVE</span>
-          </div>
+      <div className="lg:col-span-2 flex flex-col gap-12">
+        {/* Cinematic Header Strip Floating */}
+        <div className="border-[4px] border-white px-6 py-4 flex items-center justify-between shadow-[8px_8px_0_var(--plasma)]" style={{ background: 'var(--ink)' }}>
+          <span className="nb-mono font-bold text-[14px] uppercase tracking-widest text-white">
+            {explanation.scene_source?.toUpperCase() || 'CINEMATIC MASTERCLASS'}
+          </span>
+          <span className="nb-mono text-white/50 text-[10px] font-bold">V16_ENGINE_ACTIVE</span>
+        </div>
 
-          <div className="p-8 space-y-10">
+        <div className="space-y-16">
             {/* 1. THE HOOK */}
-            <section className="nb-fade-in">
-              <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--theme-accent-secondary)', color: 'var(--theme-bg)', fontWeight: 'bold' }}>
+            <section className="nb-fade-in px-4">
+              <span className="nb-display text-white tracking-widest" style={{ fontSize: '42px', textShadow: '3px 3px 0 var(--ion)' }}>
                 THE HOOK
               </span>
-              <p className="mt-4 nb-display" style={{ fontSize: '32px', color: 'var(--theme-text)', fontWeight: 'bold', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+              <p className="mt-4 nb-mono text-white/90" style={{ fontSize: '18px', lineHeight: 1.6, maxWidth: '85%' }}>
                 {explanation.hook}
               </p>
             </section>
@@ -184,12 +183,9 @@ export default function UnifiedExplainer({
               </div>
             </section>
 
-            {/* 4. DEEP DIVE */}
+            {/* 4. DEEP DIVE AS NEON CARDS */}
             <section className="nb-fade-in">
-              <span className="nb-mono px-2 py-1" style={{ fontSize: '10px', background: 'var(--theme-accent)', color: 'var(--theme-bg)', fontWeight: 'bold' }}>
-                THE MASTERCLASS (STEP-BY-STEP)
-              </span>
-              <div className="mt-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 px-4">
                 {(Array.isArray(explanation.deep_dive) ? explanation.deep_dive : []).map((step, i) => {
                   const cleanStep = typeof step === 'string' ? step.replace(/^\d+\.\s*/, '').trim() : '';
                   if (!cleanStep) return null;
@@ -197,27 +193,31 @@ export default function UnifiedExplainer({
                   return (
                     <div 
                       key={i} 
-                      className="group relative p-6 border-2 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-300"
-                      style={{ borderLeft: '4px solid var(--theme-accent)' }}
+                      className="group relative p-6 flex flex-col transition-all hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(255,0,122,0.6)]"
+                      style={{ 
+                        background: 'var(--ink)', 
+                        border: '4px solid var(--plasma)',
+                        boxShadow: '0 0 15px rgba(255, 0, 122, 0.3)',
+                      }}
                     >
-                      <div className="flex gap-4">
-                        <div className="nb-display text-volt opacity-20 group-hover:opacity-100 transition-opacity text-2xl leading-none">
-                          {String(i + 1).padStart(2, '0')}
-                        </div>
-                        <p className="nb-mono flex-1" style={{ fontSize: '14px', color: 'var(--theme-text)', lineHeight: 1.6 }}>
-                          {cleanStep}
-                        </p>
+                      <div className="border-b-[4px] border-plasma pb-3 mb-6 flex justify-between items-center">
+                        <span className="nb-display text-white text-3xl tracking-wide uppercase">CORE CONCEPT: {i + 1}</span>
                       </div>
+                      
+                      <div className="flex-1 nb-mono text-white/80 leading-relaxed text-[13px] mb-8">
+                        {cleanStep}
+                      </div>
+
+                      <button className="w-full bg-[#DBFF00] hover:bg-[#c9e600] text-black nb-display text-2xl py-4 transition-colors">
+                        EXPLORE CONCEPT &gt;
+                      </button>
                     </div>
                   );
                 })}
               </div>
             </section>
 
-            {/* Divider */}
-            <div className="pt-8 border-t-2 border-white/5" />
           </div>
-        </NbCard>
 
         {/* 5. CONCEPT MAPPER (Now Prominent) */}
         {explanation.mapping && explanation.mapping.length > 0 && (

@@ -71,7 +71,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--ink)' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--app-bg)' }}>
       <div className="nb-scanline-overlay" />
       <div className="nb-card w-full max-w-md p-8" style={{ border: 'var(--bd)', background: 'var(--ink)' }}>
         <h1 className="nb-display nb-glitch text-center mb-2" style={{ fontSize: '32px', color: 'var(--volt)' }}>

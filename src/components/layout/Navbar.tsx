@@ -17,23 +17,21 @@ export default function Navbar() {
 
   return (
     <nav
-      className="flex items-center justify-between px-6 py-4 sticky top-0 z-50 transition-all border-b-4 border-black"
+      className="flex items-center justify-between px-8 py-5 sticky top-0 z-50 transition-all border-b-[4px] border-white/5 backdrop-blur-md"
       style={{
-        background: 'var(--theme-bg)',
+        background: 'rgba(10, 10, 10, 0.85)',
       }}
     >
       {/* Logo */}
-      <Link href={user ? '/dashboard' : '/'} className="flex items-center gap-2 no-underline">
+      <Link href={user ? '/dashboard' : '/'} className="flex items-center gap-2 no-underline group">
           <span
-            className="nb-display px-4 py-1.5"
+            className="nb-display px-2 py-1 transition-transform group-hover:scale-105"
             style={{
-              background: 'var(--theme-accent)',
-              color: 'var(--theme-bg)',
-              fontSize: '22px',
+              color: 'white',
+              fontSize: '32px',
               fontWeight: 900,
-              letterSpacing: '0.05em',
-              border: '4px solid black',
-              boxShadow: '4px 4px 0 black'
+              letterSpacing: '0.08em',
+              textShadow: '3px 3px 0 var(--plasma)'
             }}
           >
             EDUFUSION
@@ -49,16 +47,16 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="nb-mono no-underline transition-all hover:scale-110"
+                className="nb-mono no-underline transition-all hover:text-white"
                   style={{
-                    fontSize: '14px',
-                    fontWeight: '900',
+                    fontSize: '13px',
+                    fontWeight: 'bold',
                     textTransform: 'uppercase',
                     letterSpacing: '0.15em',
-                    color: isActive ? 'var(--theme-accent)' : 'var(--theme-text)',
-                    borderBottom: isActive ? '5px solid var(--theme-accent)' : '5px solid transparent',
-                    padding: '6px 10px',
-                    background: isActive ? 'rgba(var(--theme-accent-rgb), 0.15)' : 'transparent',
+                    color: isActive ? 'var(--volt)' : 'rgba(255,255,255,0.6)',
+                    borderBottom: isActive ? '3px solid var(--volt)' : '3px solid transparent',
+                    padding: '8px 4px',
+                    textShadow: isActive ? '0 0 10px rgba(219,255,0,0.3)' : 'none',
                   }}
               >
                 {link.label}
@@ -68,24 +66,23 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Right side */}
+      {/* Right side: Authenticated */}
       {user && userProfile && (
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col items-end">
-             <span className="nb-mono text-[9px] font-bold opacity-80" style={{ color: 'var(--theme-accent)' }}>TOTAL XP</span>
-             <span className="nb-display" style={{ fontSize: '24px', lineHeight: 1, color: 'var(--theme-accent)' }}>{userProfile.xp || 0}</span>
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-8">
+          <div className="hidden sm:flex flex-col items-end">
+             <span className="nb-mono text-[10px] font-bold tracking-widest text-volt/70">TOTAL XP</span>
+             <span className="nb-display text-[26px] leading-[0.8] text-volt drop-shadow-[0_0_8px_rgba(219,255,0,0.4)]">{userProfile.xp || 0}</span>
           </div>
 
           <Link href="/profile" className="flex items-center gap-3 no-underline group">
             <div
-              className="nb-mono px-5 py-2.5 transition-all group-hover:-rotate-2"
+              className="nb-mono px-4 py-2 transition-transform group-hover:-rotate-3 shadow-[4px_4px_0_var(--plasma)]"
               style={{
-                fontSize: '16px',
+                fontSize: '14px',
                 fontWeight: '900',
-                background: 'var(--theme-accent-secondary)',
-                color: 'var(--theme-bg)',
-                border: '4px solid black',
-                boxShadow: '4px 4px 0 black'
+                background: 'var(--ink)',
+                color: 'white',
+                border: '4px solid var(--plasma)',
               }}
             >
               LV {userProfile.level || 1}
@@ -94,11 +91,22 @@ export default function Navbar() {
 
           <button
             onClick={signOut}
-            className="nb-mono px-4 py-2 border-4 transition-all"
-            style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--theme-text)', background: 'none', cursor: 'pointer', borderColor: 'rgba(var(--theme-text-rgb), 0.2)' }}
+            className="nb-mono px-4 sm:px-6 py-2 border-[2px] border-white/20 text-white/50 hover:text-white hover:border-white transition-all uppercase tracking-widest text-[11px] font-bold"
           >
-           EXIT
+           LOGOUT
           </button>
+        </div>
+      )}
+
+      {/* Right side: Unauthenticated */}
+      {!user && (
+        <div className="flex items-center gap-6">
+          <Link href="/login" className="nb-mono text-[11px] font-bold tracking-widest text-white/50 hover:text-white transition-all uppercase">
+            LOGIN
+          </Link>
+          <Link href="/signup" className="nb-mono px-6 py-2 border-[2px] border-volt text-volt hover:bg-volt hover:text-ink transition-all uppercase tracking-widest text-[11px] font-bold shadow-[2px_2px_0_var(--plasma)]">
+            SIGN UP
+          </Link>
         </div>
       )}
     </nav>

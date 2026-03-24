@@ -121,6 +121,8 @@ export default function CoursePage() {
             <div className="nb-cube-face nb-cube-back">D</div>
             <div className="nb-cube-face nb-cube-top">U</div>
             <div className="nb-cube-face nb-cube-bottom">F</div>
+            <div className="nb-cube-face nb-cube-left">U</div>
+            <div className="nb-cube-face nb-cube-right">!</div>
           </div>
         </div>
       </div>
@@ -128,55 +130,67 @@ export default function CoursePage() {
   }
 
   return (
-    <div style={{ background: 'var(--ink)', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--app-bg)', minHeight: '100vh' }}>
       <Navbar />
 
       {/* Course Header: Cinematic & Stat-Rich */}
-      <div className="nb-page-hero" style={{ borderBottom: 'var(--bd)', paddingBottom: '4rem' }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <NbButton variant="dark" size="sm" onClick={() => router.push('/dashboard')} className="mb-6">
-            ← TERMINAL
-          </NbButton>
+      <div className="relative overflow-hidden" style={{ borderBottom: '4px solid var(--plasma)', paddingBottom: '4rem', paddingTop: '4rem', background: 'var(--app-bg)' }}>
+        <div className="absolute inset-0 bg-[#FF007A]/5 pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <button 
+            onClick={() => router.push('/dashboard')} 
+            className="mb-8 nb-mono font-bold text-[11px] text-white/50 hover:text-white transition-colors uppercase tracking-widest"
+          >
+            ← RETURN TO TERMINAL
+          </button>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
             <div>
-              <span className="nb-mono text-volt mb-2 block font-bold tracking-widest text-[10px]">CORE CURRICULUM OVERVIEW</span>
-              <h1 className="nb-display nb-glitch" style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', color: 'var(--chalk)', lineHeight: 0.9 }}>
+              <span className="nb-mono text-plasma mb-4 block font-bold tracking-widest text-[12px] uppercase">
+                 CORE CURRICULUM OVERVIEW
+              </span>
+              <h1 className="nb-display leading-[0.85] tracking-tighter" style={{ fontSize: 'clamp(4rem, 8vw, 100px)', color: 'var(--chalk)', textShadow: '4px 4px 0 var(--plasma)' }}>
                 {courseTitle.toUpperCase()}
               </h1>
-              <div className="flex items-center gap-4 mt-8">
-                <div className="flex-1 max-w-sm">
-                  <div className="nb-progress-track" style={{ height: '8px' }}>
-                    <div className="nb-progress-fill nb-progress-fill-volt" style={{ width: `${progressPct}%` }} />
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8 mt-12 bg-black/40 p-6 border-[2px] border-white/10 relative">
+                {/* Glow behind stats */}
+                <div className="absolute inset-0 bg-plasma/5 blur-xl -z-10" />
+
+                <div className="flex-1 w-full max-w-sm">
+                  <div className="nb-progress-track border-[2px] border-white/20 p-1" style={{ height: 'auto', background: 'transparent' }}>
+                    <div className="h-2 bg-plasma shadow-[0_0_10px_var(--plasma)] transition-all" style={{ width: `${progressPct}%` }} />
                   </div>
-                  <span className="nb-mono mt-2 block" style={{ fontSize: '11px', color: '#666' }}>
-                    MASTERY: <span className="text-volt">{progressPct}%</span>
+                  <span className="nb-mono mt-3 block font-bold tracking-widest" style={{ fontSize: '11px', color: '#888' }}>
+                    MASTERY <span className="text-plasma ml-2">{progressPct}%</span>
                   </span>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <div className="nb-stat-cell nb-stat-volt p-4 border-l-4 border-black">
-                    <div className="nb-stat-number" style={{ fontSize: '32px' }}>{units.length}</div>
-                    <div className="nb-stat-label">UNITS</div>
+
+                <div className="flex gap-4 w-full sm:w-auto">
+                  <div className="p-4 border-[2px] border-plasma/50 bg-black/50 text-center flex-1 sm:flex-none">
+                    <div className="nb-display text-white" style={{ fontSize: '32px', lineHeight: 1 }}>{units.length}</div>
+                    <div className="nb-mono text-plasma font-bold mt-1 tracking-widest" style={{ fontSize: '9px' }}>UNITS</div>
                   </div>
-                  <NbButton 
-                    variant="volt" 
-                    size="sm"
+                  <button 
                     onClick={() => router.push(`/quiz/course/${courseId}`)}
-                    className="w-full"
+                    className="flex-1 sm:flex-none bg-plasma hover:bg-[#ff1a8c] text-white nb-display text-2xl px-6 flex items-center justify-center transition-colors shadow-[4px_4px_0_white]"
                   >
-                    COURSE EXAM 🎓
-                  </NbButton>
+                    EXAM 🎓
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="hidden lg:flex justify-end">
-              <div className="nb-cube-scene">
+            <div className="hidden lg:flex justify-end relative">
+               <div className="absolute inset-0 bg-ion blur-[80px] opacity-20 rounded-full" />
+              <div className="nb-cube-scene scale-125 relative z-10">
                 <div className="nb-cube">
-                  <div className="nb-cube-face nb-cube-front">E</div>
-                  <div className="nb-cube-face nb-cube-back">D</div>
-                  <div className="nb-cube-face nb-cube-top">U</div>
-                  <div className="nb-cube-face nb-cube-bottom">F</div>
+                  <div className="nb-cube-face nb-cube-front">C</div>
+                  <div className="nb-cube-face nb-cube-back">O</div>
+                  <div className="nb-cube-face nb-cube-top">R</div>
+                  <div className="nb-cube-face nb-cube-bottom">E</div>
+                  <div className="nb-cube-face nb-cube-left">A</div>
+                  <div className="nb-cube-face nb-cube-right">I</div>
                 </div>
               </div>
             </div>
@@ -197,38 +211,39 @@ export default function CoursePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: uIndex * 0.1 }}
             >
-              <NbCard
-                variant={unit.isCompleted ? 'ion' : 'default'}
-                className="cursor-pointer group"
+              <div
+                className="cursor-pointer group relative p-6 bg-[var(--ink)] transition-transform hover:-translate-y-1"
                 onClick={() => toggleUnit(unit.id)}
+                style={{ 
+                   border: `4px solid ${unit.isCompleted ? 'var(--ion)' : 'white'}`,
+                   boxShadow: `0 0 15px ${unit.isCompleted ? 'rgba(0, 245, 255, 0.3)' : 'transparent'}`,
+                }}
               >
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
-                      <div className="nb-stat-number text-white/10 group-hover:text-volt/30 transition-colors" style={{ fontSize: '48px' }}>
+                      <div className="nb-display text-white/20 group-hover:text-plasma/60 transition-colors" style={{ fontSize: '56px', lineHeight: 0.8 }}>
                         {String(unit.order).padStart(2, '0')}
                       </div>
                       <div>
-                        <span className="nb-mono" style={{ fontSize: '10px', color: '#888', letterSpacing: '0.1em' }}>
+                        <span className="nb-mono" style={{ fontSize: '11px', color: '#888', letterSpacing: '0.15em', fontWeight: 'bold' }}>
                           MILESTONE {unit.order}
                         </span>
-                        <h2 className="nb-display" style={{ fontSize: '28px', color: 'var(--chalk)', lineHeight: 1.1 }}>
+                        <h2 className="nb-display mt-1 tracking-wide" style={{ fontSize: '32px', color: 'var(--chalk)', lineHeight: 1 }}>
                           {unit.isCompleted ? '✓ ' : ''}{unit.title}
                         </h2>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <NbButton 
-                        variant="plasma" 
-                        size="sm"
+                    <div className="flex items-center gap-6">
+                      <button 
                         onClick={(e) => {
                           e.stopPropagation();
                           router.push(`/quiz/unit/${unit.id}`);
                         }}
-                        className="nb-mono text-[9px] font-bold"
+                        className="bg-plasma hover:bg-[#ff1a8c] text-white nb-mono text-[10px] font-bold px-4 py-2 uppercase tracking-widest transition-colors shadow-[2px_2px_0_white]"
                       >
                         UNIT QUIZ ⚡
-                      </NbButton>
-                      <span className="nb-display" style={{ fontSize: '24px', color: isExpanded ? 'var(--volt)' : '#444' }}>
+                      </button>
+                      <span className="nb-display" style={{ fontSize: '32px', color: isExpanded ? 'var(--plasma)' : '#666' }}>
                         {isExpanded ? '⬘' : '⬙'}
                       </span>
                     </div>
@@ -245,50 +260,48 @@ export default function CoursePage() {
                         return (
                           <div
                             key={topic.id}
-                            className="nb-card p-6 group/topic"
+                            className="p-6 group/topic relative overflow-hidden"
                             style={{ 
-                              background: 'rgba(255,255,255,0.02)', 
-                              borderLeft: `6px solid ${topic.isCompleted ? 'var(--ion)' : 'var(--plasma)'}`,
+                              background: 'rgba(255,255,255,0.03)', 
+                              border: `2px solid ${topic.isCompleted ? 'var(--ion)' : 'rgba(255,255,255,0.1)'}`,
+                              borderLeft: `8px solid ${topic.isCompleted ? 'var(--ion)' : 'var(--plasma)'}`,
                               transition: 'all 0.3s'
                             }}
                           >
-                            <div className="flex flex-col h-full">
-                              <div className="flex justify-between items-start mb-4">
-                                <h3 className="nb-display mb-1" style={{ fontSize: '18px', color: 'var(--chalk)' }}>
+                            <div className="flex flex-col h-full relative z-10">
+                              <div className="flex justify-between items-start mb-6">
+                                <h3 className="nb-display leading-tight tracking-wide" style={{ fontSize: '22px', color: 'var(--chalk)' }}>
                                   {topic.isCompleted ? '✓ ' : ''}{topic.title}
                                 </h3>
-                                <NbButton
-                                  variant={topic.isCompleted ? 'ion' : 'plasma'}
-                                  size="sm"
+                                <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     router.push(`/learn/${courseId}/${topic.topicId}`);
                                   }}
-                                  className="opacity-0 group-hover/topic:opacity-100 transition-opacity"
+                                  className="bg-transparent hover:bg-white text-white hover:text-black border-2 border-white nb-mono text-[10px] font-bold px-3 py-1 uppercase tracking-widest opacity-0 group-hover/topic:opacity-100 transition-all"
                                 >
                                   {topic.isCompleted ? 'REVIEW' : 'START'}
-                                </NbButton>
+                                </button>
                               </div>
 
-                              <div className="space-y-2 mt-auto">
+                              <div className="space-y-3 mt-auto border-t-[1px] border-white/10 pt-4">
                                 {topicSubs.map((sub) => (
                                   <div
                                     key={sub.id}
-                                    className="nb-mono flex items-center justify-between text-[11px] hover:bg-white/5 p-1 px-2 cursor-pointer transition-colors"
+                                    className="nb-mono flex items-center justify-between text-[11px] hover:text-white p-1 cursor-pointer transition-colors"
                                     style={{
-                                      color: sub.isCompleted ? 'var(--ion)' : '#555',
+                                      color: sub.isCompleted ? 'var(--ion)' : '#888',
                                     }}
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      // Potentially jump to subtopic in the future
                                       router.push(`/learn/${courseId}/${topic.topicId}`);
                                     }}
                                   >
-                                    <div className="flex items-center gap-2">
-                                      <span>{sub.isCompleted ? '●' : '○'}</span>
-                                      <span>{sub.title.toUpperCase()}</span>
+                                    <div className="flex items-center gap-3">
+                                      <span className={sub.isCompleted ? 'text-ion' : 'text-[#444]'}>{sub.isCompleted ? '■' : '□'}</span>
+                                      <span className="uppercase tracking-widest">{sub.title}</span>
                                     </div>
-                                    <span className="text-[9px] opacity-0 group-hover:opacity-100">→</span>
+                                    <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                                   </div>
                                 ))}
                               </div>
@@ -298,7 +311,7 @@ export default function CoursePage() {
                       })}
                     </motion.div>
                   )}
-              </NbCard>
+              </div>
             </motion.div>
           );
         })}

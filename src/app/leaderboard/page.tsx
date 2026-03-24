@@ -54,10 +54,10 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div style={{ background: 'var(--ink)', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--app-bg)', minHeight: '100vh' }}>
       <Navbar />
 
-      <div className="nb-page-hero" style={{ background: 'var(--ink)' }}>
+      <div className="nb-page-hero" style={{ background: 'var(--app-bg)' }}>
         <h1 style={{ color: 'var(--volt)' }}>LEADERBOARD</h1>
         <div className="nb-subtitle">
           {userRank > 0 ? `YOUR RANK: #${userRank}` : 'START LEARNING TO RANK UP'}

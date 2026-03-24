@@ -23,6 +23,7 @@
 /* FORCE REFRESH v9.1.5 */
 :root {
   /* Base */
+  --app-bg: linear-gradient(135deg, #130B1E 0%, #1A1333 50%, #0D1B2A 100%);
   --ink: #0A0A0A;
   --chalk: #F8F8F8;
   --bg: #0D0D11;
@@ -775,15 +776,18 @@ body {
   justify-content: center;
   font-family: var(--ff-display);
   font-size: 24px;
-  border: 2px solid var(--ink);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  color: #fff;
 }
 
-.nb-cube-front  { transform: translateZ(26px); background: var(--volt); color: var(--ink); }
-.nb-cube-back   { transform: rotateY(180deg) translateZ(26px); background: var(--plasma); color: #fff; }
-.nb-cube-top    { transform: rotateX(90deg) translateZ(26px); background: var(--ion); color: var(--ink); }
-.nb-cube-bottom { transform: rotateX(-90deg) translateZ(26px); background: var(--solar); color: #fff; }
-.nb-cube-left   { transform: rotateY(-90deg) translateZ(26px); background: var(--nova); color: #fff; }
-.nb-cube-right  { transform: rotateY(90deg) translateZ(26px); background: var(--chalk); color: var(--ink); }
+.nb-cube-front  { transform: translateZ(26px); border-color: var(--volt); color: var(--volt); box-shadow: inset 0 0 15px rgba(219, 255, 0, 0.3), 0 0 10px rgba(219, 255, 0, 0.5); }
+.nb-cube-back   { transform: rotateY(180deg) translateZ(26px); border-color: var(--plasma); color: var(--plasma); box-shadow: inset 0 0 15px rgba(255, 0, 122, 0.3), 0 0 10px rgba(255, 0, 122, 0.5); }
+.nb-cube-top    { transform: rotateX(90deg) translateZ(26px); border-color: var(--ion); color: var(--ion); box-shadow: inset 0 0 15px rgba(0, 245, 255, 0.3), 0 0 10px rgba(0, 245, 255, 0.5); }
+.nb-cube-bottom { transform: rotateX(-90deg) translateZ(26px); border-color: var(--solar); color: var(--solar); box-shadow: inset 0 0 15px rgba(255, 122, 0, 0.3), 0 0 10px rgba(255, 122, 0, 0.5); }
+.nb-cube-left   { transform: rotateY(-90deg) translateZ(26px); border-color: var(--nova); color: var(--nova); box-shadow: inset 0 0 15px rgba(157, 0, 255, 0.3), 0 0 10px rgba(157, 0, 255, 0.5); }
+.nb-cube-right  { transform: rotateY(90deg) translateZ(26px); border-color: var(--chalk); color: var(--chalk); box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.3); }
 
 /* ── ORBIT WIDGET ───────────────────────────────────────── */
 

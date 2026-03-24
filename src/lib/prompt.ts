@@ -104,8 +104,36 @@ export function generateSubtopicPrompt(
 export function generateCoursePrompt(subject: string, syllabusText?: string): string {
   return `Generate a course for: "${subject}". Include Units, Topics, Subtopics. JSON only.`;
 }
-export function generateQuizPrompt(t: string[], i: string, m: string): string {
-  return `Generate 5 quiz questions about: ${t.join(', ')} in ${i} lens. JSON only.`;
+export function generateQuizPrompt(topics: string[], interest: string, mode: string): string {
+  const domain = INTEREST_DOMAINS[interest] || interest;
+  const modeModifier = mode === 'exam' 
+    ? 'Make the questions extremely difficult, testing deep conceptual understanding.' 
+    : 'Make the questions moderately challenging but fun.';
+
+  return `Generate a 5-question multiple-choice quiz about the following topics: 
+${topics.join(', ')}
+
+IMPORTANT: You must integrate the user's interest lens into EVERY question and explanation.
+LENS: ${interest} — ${domain}
+${modeModifier}
+
+RULES:
+1. Each question must have exactly 4 options.
+2. The 'correctAnswer' must exactly match one of the strings in the 'options' array.
+3. The 'explanation' must explain WHY the answer is correct using an analogy from the interest lens.
+4. You MUST return ONLY valid JSON. No markdown backticks, no conversational text.
+
+REQUIRED JSON FORMAT:
+{
+  "questions": [
+    {
+      "question": "Question text using the interest lens...",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAnswer": "Option B",
+      "explanation": "Explanation using the interest lens..."
+    }
+  ]
+}`;
 }
 export function generateMentorPrompt(c: {
   subtopicTitle: string;

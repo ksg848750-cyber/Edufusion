@@ -18,7 +18,7 @@ import { MessageCircle } from "lucide-react";
 export default function ExplainPageWrapper() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--ink)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-bg)' }}>
         <div className="nb-mono" style={{ color: '#888' }}>Loading...</div>
       </div>
     }>
@@ -407,6 +407,8 @@ function ExplainPage() {
                 <div className="nb-cube-face nb-cube-back">D</div>
                 <div className="nb-cube-face nb-cube-top">U</div>
                 <div className="nb-cube-face nb-cube-bottom">F</div>
+                <div className="nb-cube-face nb-cube-left">U</div>
+                <div className="nb-cube-face nb-cube-right">!</div>
               </div>
             </div>
             <p className="nb-mono" style={{ fontSize: '12px', color: '#888' }}>

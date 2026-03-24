@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const currentXP = userData.xp || 0;
     const currentLevel = userData.level || 1;
 
-    const newXP = currentXP + actionXP;
+    const newXP = Math.max(0, currentXP + actionXP);
     const newLevel = getLevelFromXP(newXP);
     const newTier = getTierFromLevel(newLevel);
     const newAvatarStage = getAvatarStageFromLevel(newLevel);
